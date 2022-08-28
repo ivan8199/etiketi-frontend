@@ -12,22 +12,22 @@ import {
   Text,
   theme,
   VStack,
+  Flex,
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
+import { Navbar } from './Navbar';
+import Dashboard from './Dashboard';
 import SketchComponent from './SketchComponent';
 
 function App() {
-  const [padding, setpadding] = useState(0);
-
   return (
     <ChakraProvider theme={theme}>
-      <Box textAlign="center" fontSize="xl" bg={'gray.100'}>
-        <Grid minH="100vh" p={3}>
+      <Box textAlign="center" fontSize="xl" bg={'gray.50'}>
+        <Flex direction={'column'} minH="100vh">
+          <Navbar />
           <VStack spacing={8}>
-            <Text>
-              Edit <Code fontSize="xl">src/App.js</Code> and save to reload.
-            </Text>
-            <Button
+            <Dashboard />
+            {/* <Button
               onClick={() => {
                 setpadding(10);
               }}
@@ -46,10 +46,9 @@ function App() {
                 <NumberIncrementStepper />
                 <NumberDecrementStepper />
               </NumberInputStepper>
-            </NumberInput>
-            <SketchComponent padding={padding} />
+            </NumberInput> */}
           </VStack>
-        </Grid>
+        </Flex>
       </Box>
     </ChakraProvider>
   );
