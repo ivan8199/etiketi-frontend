@@ -72,7 +72,7 @@ const SketchComponent = props => {
         // });
         var formData = new FormData();
         formData.append('canvas', blob);
-        fetch('http://localhost:8080/main/save', {
+        fetch('https://etiketi-backend.herokuapp.com/main/save', {
           method: 'POST',
 
           body: formData,
