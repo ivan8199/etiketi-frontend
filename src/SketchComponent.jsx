@@ -7,6 +7,8 @@ let padding = 0;
 let text = 'Computer cleaning spray (compressed)';
 let rectArray = [];
 let selectedTemplate = '1';
+let img;
+let imgcoords = { x: 0, y: 0 };
 
 let current = {};
 // let img;
@@ -39,7 +41,7 @@ const SketchComponent = props => {
 
   useEffect(() => {
     selectedTemplate = props.selectedTemplate;
-    p5hold.resizeCanvas(
+    p5hold?.resizeCanvas(
       templateTypes?.['T' + selectedTemplate]?.w,
       templateTypes?.['T' + selectedTemplate]?.h
     );
@@ -59,27 +61,44 @@ const SketchComponent = props => {
       current.y = p5.mouseY;
     });
     cnv.mouseReleased(event => {
-      props.addTextboxHandler({
-        position: {
-          x: current.x,
-          y: current.y,
-          w: p5.mouseX - current.x,
-          h: p5.mouseY - current.y,
-        },
-        text: text,
-        title: 'Textbox #3',
-        padding: padding,
-      });
+      if (false)
+        props.addTextboxHandler({
+          position: {
+            x: current.x,
+            y: current.y,
+            w: p5.mouseX - current.x,
+            h: p5.mouseY - current.y,
+          },
+          text: text,
+          title: 'Textbox #3',
+          padding: padding,
+        });
 
       current = {};
     });
+
+    // cnv.mouseDragged(event => {});
+  };
+
+  const mouseDragged = p5 => {
+    if (
+      p5.mouseX > imgcoords.x &&
+      p5.mouseX < imgcoords.x + 130 &&
+      p5.mouseY > imgcoords.y &&
+      p5.mouseY < imgcoords.y + 70
+    ) {
+      console.log(p5.mouseX, p5.mouseY);
+      imgcoords.x = p5.mouseX - 65;
+      imgcoords.y = p5.mouseY - 20;
+    }
   };
 
   const draw = p5 => {
     p5.background(255);
+
     // p5.rect(10, 10, 10, 10);
-    // p5.text('mouseX: ' + p5.mouseX, 10, 30);
-    // p5.text('mouseY: ' + p5.mouseY, 10, 40);
+
+    p5.image(img, imgcoords?.x, imgcoords?.y, 130, 70);
 
     rectArray.forEach(rect => {
       p5.rect(...Object.values(rect.position));
@@ -87,23 +106,24 @@ const SketchComponent = props => {
       p5.text(rect.text, ...Object.values(transformed));
     });
 
-    if (Object.keys(current).length !== 0) {
-      p5.rect(
-        current.x,
-        current.y,
-        p5.mouseX - current.x,
-        p5.mouseY - current.y
-      );
-      p5.text(
-        text,
-        current.x + padding,
-        current.y + padding,
-        p5.mouseX - current.x - padding,
-        p5.mouseY - current.y - padding
-      );
-    }
-
-    // p5.image(img, 0, 0, 100, 100);
+    if (false)
+      if (Object.keys(current).length !== 0) {
+        p5.rect(
+          current.x,
+          current.y,
+          p5.mouseX - current.x,
+          p5.mouseY - current.y
+        );
+        p5.text(
+          text,
+          current.x + padding,
+          current.y + padding,
+          p5.mouseX - current.x - padding,
+          p5.mouseY - current.y - padding
+        );
+      }
+    // p5.text('mouseX: ' + p5.mouseX, 10, 30);
+    // p5.text('mouseY: ' + p5.mouseY, 10, 40);
   };
 
   const transformPadding = rect => {
@@ -116,13 +136,20 @@ const SketchComponent = props => {
   };
 
   const preload = p5 => {
-    // console.log('preload');
+    console.log('preload');
+    img = p5.loadImage('http://localhost:8080/main/barcode');
   };
 
   return (
     <Box p={'3rem'}>
       <Box boxShadow={'dark-lg'} bg={'teal.200'}>
-        <Sketch id={'mainCanvas'} setup={setup} draw={draw} preload={preload} />
+        <Sketch
+          id={'mainCanvas'}
+          setup={setup}
+          draw={draw}
+          preload={preload}
+          mouseDragged={mouseDragged}
+        />
       </Box>
     </Box>
   );
