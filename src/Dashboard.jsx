@@ -1,12 +1,14 @@
-import { Container, Flex, HStack } from '@chakra-ui/react';
+import { Box, Container, Flex, HStack, VStack } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import DashboardTabs from './DashboardTabs';
+import SelectMenu from './SelectMenu';
 import SketchComponent from './SketchComponent';
 
 const Dashboard = () => {
   const [padding, setpadding] = useState(0);
 
   const [textboxFormData, setTextboxFormData] = useState({ text: '' });
+  const [selectedTemplate, setSelectedTemplate] = useState('2');
 
   const onTextChange = value => {
     setTextboxFormData(prev => {
@@ -14,45 +16,34 @@ const Dashboard = () => {
     });
   };
 
-  const [textboxArray, settestboxArray] = useState([
-    {
-      title: 'Textbox #1',
-      text: 'Origin: China',
-      position: {
-        x: 100,
-        y: 100,
-        w: 50,
-        h: 50,
-      },
-      padding: 5,
-    },
-    {
-      title: 'Textbox #2',
-      text: 'Article: Adjustable height Gaming Chair - Corsair 4000',
-      position: {
-        x: 200,
-        y: 200,
-        w: 150,
-        h: 100,
-      },
-      padding: 10,
-    },
-  ]);
+  const [textboxArray, settestboxArray] = useState([]);
 
   const addTextbox = textbox => {
     console.log('added', textbox);
     settestboxArray(prev => [...prev, textbox]);
   };
 
+  const onSelectedChangeHandler = event => {
+    setSelectedTemplate(event.target.value);
+    console.log(event.target.value);
+  };
+
   return (
     <Container maxW={'1280px'}>
       <Flex>
-        <SketchComponent
-          padding={padding}
-          textboxArray={textboxArray}
-          addTextboxHandler={addTextbox}
-          textValue={textboxFormData?.text}
-        />
+        <VStack width={'50%'}>
+          <SelectMenu
+            value={selectedTemplate}
+            onChange={onSelectedChangeHandler}
+          />
+          <SketchComponent
+            selectedTemplate={selectedTemplate}
+            padding={padding}
+            textboxArray={textboxArray}
+            addTextboxHandler={addTextbox}
+            textValue={textboxFormData?.text}
+          />
+        </VStack>
         <DashboardTabs
           textboxArray={textboxArray}
           onTextChange={onTextChange}

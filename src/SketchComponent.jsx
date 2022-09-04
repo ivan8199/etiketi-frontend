@@ -3,16 +3,26 @@ import axios from 'axios';
 import React, { useEffect } from 'react';
 import Sketch from 'react-p5';
 
-let x1 = 0;
-let y1 = 0;
 let padding = 0;
-
 let text = 'Computer cleaning spray (compressed)';
-
 let rectArray = [];
+let selectedTemplate = '1';
 
 let current = {};
-let img;
+// let img;
+
+const templateTypes = {
+  T1: {
+    w: 198,
+    h: 120,
+  },
+  T2: {
+    w: 297,
+    h: 210,
+  },
+};
+
+let p5hold;
 
 const SketchComponent = props => {
   useEffect(() => {
@@ -27,27 +37,28 @@ const SketchComponent = props => {
     text = props.textValue;
   }, [props.textValue]);
 
+  useEffect(() => {
+    selectedTemplate = props.selectedTemplate;
+    p5hold.resizeCanvas(
+      templateTypes?.['T' + selectedTemplate]?.w,
+      templateTypes?.['T' + selectedTemplate]?.h
+    );
+  }, [props.selectedTemplate]);
+
   const setup = (p5, canvasParentRef) => {
-    const cnv = p5.createCanvas(198, 120).parent(canvasParentRef);
+    p5hold = p5;
+    const cnv = p5
+      .createCanvas(
+        templateTypes?.['T' + selectedTemplate]?.w,
+        templateTypes?.['T' + selectedTemplate]?.h
+      )
+      .parent(canvasParentRef);
 
     cnv.mousePressed(event => {
       current.x = p5.mouseX;
       current.y = p5.mouseY;
     });
     cnv.mouseReleased(event => {
-      console.log('released');
-      //   rectArray.push({
-      //     position: {
-      //       x: current.x,
-      //       y: current.y,
-      //       w: p5.mouseX - current.x,
-      //       h: p5.mouseY - current.y,
-      //     },
-      //     text: text,
-
-      //     padding: padding,
-      //   });
-
       props.addTextboxHandler({
         position: {
           x: current.x,
@@ -60,55 +71,15 @@ const SketchComponent = props => {
         padding: padding,
       });
 
-      console.log(cnv);
-      const canvas = document.getElementById('defaultCanvas0');
-      canvas.toBlob(async blob => {
-        var formData = new FormData();
-        formData.append('canvas', blob);
-
-        axios
-          .post(
-            // 'http://localhost:8080/main/download',
-            'https://etiketi-backend.herokuapp.com/main/download',
-
-            formData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-              responseType: 'blob',
-            }
-          )
-          .then(response => {
-            console.log(response);
-            // create file link in browser's memory
-            const href = URL.createObjectURL(
-              new Blob([response.data], { type: 'application/pdf' })
-            );
-
-            // create "a" HTLM element with href to file & click
-            const link = document.createElement('a');
-            link.href = href;
-            link.setAttribute('download', 'file.pdf'); //or any other extension
-            document.body.appendChild(link);
-            link.click();
-
-            // clean up "a" element & remove ObjectURL
-            document.body.removeChild(link);
-            //   URL.revokeObjectURL(url);
-          });
-        console.log(blob);
-      }, 'image/png');
-      console.log(img);
       current = {};
     });
   };
 
   const draw = p5 => {
     p5.background(255);
-    p5.rect(10, 10, 10, 10);
-    p5.text('mouseX: ' + p5.mouseX, 10, 30);
-    p5.text('mouseY: ' + p5.mouseY, 10, 40);
+    // p5.rect(10, 10, 10, 10);
+    // p5.text('mouseX: ' + p5.mouseX, 10, 30);
+    // p5.text('mouseY: ' + p5.mouseY, 10, 40);
 
     rectArray.forEach(rect => {
       p5.rect(...Object.values(rect.position));
@@ -145,12 +116,12 @@ const SketchComponent = props => {
   };
 
   const preload = p5 => {
-    console.log('preload');
+    // console.log('preload');
   };
 
   return (
-    <Box width={'50%'} p={'3rem'}>
-      <Box boxShadow={'lg'}>
+    <Box p={'3rem'}>
+      <Box boxShadow={'dark-lg'} bg={'teal.200'}>
         <Sketch id={'mainCanvas'} setup={setup} draw={draw} preload={preload} />
       </Box>
     </Box>
