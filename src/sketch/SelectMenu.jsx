@@ -13,19 +13,23 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import React from 'react';
+import React, { useState } from 'react';
 
 const SelectMenu = props => {
+  const [selectedPageNumber, setSelectedPageNumber] = useState('1');
+
   const create = () => {
     const canvas = document.getElementById('defaultCanvas0');
     canvas.toBlob(async blob => {
       var formData = new FormData();
       formData.append('canvas', blob);
-      formData.append('template', props.value);
+      formData.append('template', props.selectedTemplate);
+      formData.append('pages', selectedPageNumber);
 
       axios
         .post(
-          'http://localhost:8080/main/download',
+          'https://etiketi-backend.herokuapp.com/main/download',
+          // TODO env variable
           // 'https://etiketi-backend.herokuapp.com/main/download',
           formData,
           {
@@ -42,6 +46,7 @@ const SelectMenu = props => {
 
           const link = document.createElement('a');
           link.href = href;
+          // TODO add file name
           link.setAttribute('download', 'file.pdf');
           document.body.appendChild(link);
           link.click();
@@ -61,35 +66,40 @@ const SelectMenu = props => {
             boxShadow={'lg'}
             size={'sm'}
             onChange={props.onChange}
-            value={props.value}
+            value={props.selectedTemplate}
             bg={'white'}
           >
-            <option value="1">70mm x 31.5 (3x7)</option>
-            <option value="2">105mm x 74.25mm (2x4)</option>
-          </Select>{' '}
+            <option value={'1'}>70mm x 31.5 (3x7)</option>
+            <option value={'2'}>105mm x 74.25mm (2x4)</option>
+          </Select>
         </FormControl>
         <ButtonGroup
           pt={7}
           pr={7}
           width={'50%'}
           colorScheme={'blue'}
-          size="sm"
+          size={'sm'}
           isAttached
-          variant="outline"
+          variant={'outline'}
         >
-          <Button boxShadow={'lg'} width={'50%'} onClick={create}>
+          <Button boxShadow={'lg'} width={'50%'} isDisabled>
             Create
           </Button>
           <Button boxShadow={'lg'} width={'50%'} isDisabled>
             Import JSON
           </Button>
         </ButtonGroup>
-        s
       </HStack>
       <HStack width={'100%'} pt={2}>
         <FormControl width={'50%'}>
           <FormLabel fontSize={'xs'}>Number of pages</FormLabel>
-          <NumberInput boxShadow={'lg'} bg={'white'} size={'sm'}>
+          <NumberInput
+            boxShadow={'lg'}
+            bg={'white'}
+            size={'sm'}
+            onChange={setSelectedPageNumber}
+            value={selectedPageNumber}
+          >
             <NumberInputField />
             <NumberInputStepper>
               <NumberIncrementStepper />
@@ -100,20 +110,19 @@ const SelectMenu = props => {
         <ButtonGroup
           width={'50%'}
           colorScheme={'blue'}
-          size="sm"
+          size={'sm'}
           isAttached
-          variant="outline"
+          variant={'outline'}
           pt={7}
           pr={7}
         >
-          <Button boxShadow={'lg'} width={'50%'}>
+          <Button boxShadow={'lg'} width={'50%'} onClick={create}>
             Save PDF
           </Button>
           <Button boxShadow={'lg'} width={'50%'} isDisabled>
             Export JSON
           </Button>
         </ButtonGroup>
-        s
       </HStack>
     </VStack>
   );

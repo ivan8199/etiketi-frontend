@@ -12,7 +12,7 @@ const TextCard = props => {
     >
       <Stack spacing={'0.5'} fontSize={'xs'}>
         <Text color={'blue.700'} fontWeight="medium" textAlign={'start'}>
-          {props.title}
+          {props.id}
         </Text>
         <Text color={'blue.600'} textAlign={'start'}>
           {props.text}
@@ -23,10 +23,12 @@ const TextCard = props => {
         <IconButton
           icon={<EditIcon fontSize="1rem" color={'blue.700'} />}
           variant="ghost"
+          onClick={props.selectCurrent}
         />
         <IconButton
           icon={<DeleteIcon fontSize="1rem" color={'blue.700'} />}
           variant="ghost"
+          onClick={props.deleteSelected}
         />
       </Stack>
     </Stack>

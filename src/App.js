@@ -1,52 +1,16 @@
-import {
-  Box,
-  Button,
-  ChakraProvider,
-  Code,
-  Grid,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Text,
-  theme,
-  VStack,
-  Flex,
-} from '@chakra-ui/react';
-import React, { useState } from 'react';
-import { Navbar } from './Navbar';
-import Dashboard from './Dashboard';
-import SketchComponent from './SketchComponent';
+import { Box, ChakraProvider, Flex, theme, VStack } from '@chakra-ui/react';
+import React from 'react';
+import Dashboard from './dashboard/Dashboard';
+import { Navbar } from './navbar/Navbar';
 
 function App() {
   return (
     <ChakraProvider theme={theme}>
-      <Box textAlign="center" fontSize="xl" bg={'gray.50'}>
-        <Flex direction={'column'} minH="100vh">
+      <Box textAlign={'center'} fontSize={'xl'} bg={'gray.50'}>
+        <Flex direction={'column'} minH={'100vh'}>
           <Navbar />
           <VStack spacing={8}>
             <Dashboard />
-            {/* <Button
-              onClick={() => {
-                setpadding(10);
-              }}
-            >
-              padd
-            </Button>
-            <NumberInput
-              value={padding}
-              onChange={value => {
-                setpadding(parseInt(value));
-                console.log(value);
-              }}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput> */}
           </VStack>
         </Flex>
       </Box>

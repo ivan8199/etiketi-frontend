@@ -5,11 +5,10 @@ import {
   Container,
   Flex,
   HStack,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import * as React from 'react';
 
-import { Logo } from './Logo';
+import { Logo } from '../Logo';
 
 export const Navbar = () => {
   return (
@@ -20,17 +19,17 @@ export const Navbar = () => {
             <Logo />
             <Flex justify="space-between" flex="1">
               <ButtonGroup variant="link" spacing="8">
-                {['Home', 'Labels', 'Barcodes', 'Contact'].map(item => (
+                {['Home', 'Labels', 'Barcodes'].map(item => (
                   <Button key={item}>{item}</Button>
                 ))}
               </ButtonGroup>
               <HStack spacing="3">
-                <Button variant="ghost" colorScheme={'blue'}>
+                {/* <Button variant="ghost" colorScheme={'blue'}>
                   Sign in
                 </Button>
                 <Button variant="primary" colorScheme={'blue'}>
                   Sign up
-                </Button>
+                </Button> */}
               </HStack>
             </Flex>
           </HStack>
