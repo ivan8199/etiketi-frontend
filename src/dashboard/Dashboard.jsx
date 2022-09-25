@@ -1,5 +1,5 @@
 import { Button, Container, Flex, VStack } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SelectMenu from '../sketch/SelectMenu';
 import SketchComponent from '../sketch/SketchComponent';
 import DashboardTabs from './DashboardTabs';
@@ -112,7 +112,7 @@ const Dashboard = () => {
   };
 
   const addBarcode = () => {
-    console.log(barcodeArray);
+    // console.log(barcodeArray);
     if (barcodeFormData.id) {
       setBarcodeArray(prev =>
         prev.filter(x => {
@@ -120,6 +120,7 @@ const Dashboard = () => {
         })
       );
     }
+    // console.log(current.img);
     setBarcodeArray(prev => [
       ...prev,
       {
@@ -139,9 +140,16 @@ const Dashboard = () => {
     setCurrent({});
     setBarcodeFormData(defaultBarcodeFormData);
     setControlStatus('NONE');
+    // console.log(barcodeArray);
+
+    console.log('added');
   };
+
+  useEffect(() => {
+    console.log(barcodeArray);
+  }, [barcodeArray]);
+
   const addTextbox = () => {
-    console.log(textboxArray);
     if (textboxFormData.id) {
       setTextboxArray(prev =>
         prev.filter(x => {
@@ -188,7 +196,12 @@ const Dashboard = () => {
       return x.id === selectedId;
     })[0];
     setCurrent(selected.position);
-    setBarcodeFormData(selected);
+    setBarcodeFormData({
+      id: selected.id,
+      barcode: selected.barcode,
+      rotation: selected.position.rotation,
+      img: selected.position.img,
+    });
     // console.log('selectebarcode', selected);
     setControlStatus('MOVEBARCODE');
   };
@@ -273,6 +286,7 @@ const Dashboard = () => {
           selectCurrentBarcode={selectCurrentBarcode}
           deleteSelectedBarcode={deleteSelectedBarcode}
           onBarcodeFormDataChange={onBarcodeFormDataChange}
+          currentDisabled={Object.keys(current).length !== 0}
         />
       </Flex>
     </Container>

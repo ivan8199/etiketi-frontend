@@ -67,6 +67,8 @@ const SketchComponent = props => {
     img = p5hold.loadImage(
       `https://etiketi-backend.herokuapp.com/main/barcode/${barcodeFormData.barcode}`
     );
+    current.img = img;
+    console.log('barcodeFormData', barcodeFormData);
   }, [props.barcodeFormData]);
 
   useEffect(() => {
@@ -160,21 +162,25 @@ const SketchComponent = props => {
   };
   const drawBarcode = (p5, rect, selected) => {
     p5.push();
-    p5.angleMode(p5.DEGREES);
 
     // console.log('rect', rect);
-    let selectedImage = rect.img ? rect.img : img;
     let position = rect.position;
-    // p5.translate(position.w, position.h);
-    // p5.rotate(position.rotation);
+    let selectedImage = position.img ? position.img : img;
+
     if (selected) {
       p5.stroke(p5.color('#3182ce'));
       p5.strokeWeight(7);
       p5.rect(position.x, position.y, position.w, position.h);
     }
 
-    p5.image(selectedImage, position.x, position.y, position.w, position.h);
+    p5.imageMode(p5.CENTER);
+    p5.angleMode(p5.DEGREES);
+    p5.translate(position.x + position.w / 2, position.y + position.h / 2);
+    p5.rotate(position.rotation);
 
+    if (position.rotation === 0 || position.rotation === 180)
+      p5.image(selectedImage, 0, 0, position.w, position.h);
+    else p5.image(selectedImage, 0, 0, position.h, position.w);
     p5.pop();
   };
 

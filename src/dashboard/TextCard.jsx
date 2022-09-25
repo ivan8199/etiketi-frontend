@@ -24,11 +24,13 @@ const TextCard = props => {
           icon={<EditIcon fontSize="1rem" color={'blue.700'} />}
           variant="ghost"
           onClick={props.selectCurrent}
+          disabled={props.currentDisabled}
         />
         <IconButton
           icon={<DeleteIcon fontSize="1rem" color={'blue.700'} />}
           variant="ghost"
           onClick={props.deleteSelected}
+          disabled={props.currentDisabled}
         />
       </Stack>
     </Stack>

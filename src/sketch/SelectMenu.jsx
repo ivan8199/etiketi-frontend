@@ -54,7 +54,7 @@ const SelectMenu = props => {
           document.body.removeChild(link);
           //   URL.revokeObjectURL(url);
         });
-      console.log(blob);
+      // console.log(blob);
     }, 'image/png');
   };
   return (

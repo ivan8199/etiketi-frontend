@@ -50,14 +50,14 @@ export const BarcodeWrapper = props => {
                 rows={2}
                 value={props.barcodeFormData.barcode}
                 onChange={e => {
-                  console.log(e.target.value);
+                  // console.log(e.target.value);
                   props.onFormDataChange({ barcode: e.target.value });
                 }}
               />
               <FormLabel fontSize={'xs'}>Rotation</FormLabel>
               <RadioGroup
                 onChange={e => {
-                  console.log(e);
+                  // console.log(e);
                   props.onFormDataChange({ rotation: parseInt(e) });
                 }}
                 value={props.barcodeFormData.rotation}
@@ -114,6 +114,7 @@ export const BarcodeWrapper = props => {
                 text={barcode.barcode}
                 selectCurrent={() => props.selectCurrent(barcode.id)}
                 deleteSelected={() => props.deleteSelected(barcode.id)}
+                currentDisabled={props.currentDisabled}
               />
             );
           })}

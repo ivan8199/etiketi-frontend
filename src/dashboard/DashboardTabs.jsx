@@ -24,6 +24,7 @@ const DashboardTabs = props => {
               selectCurrent={props.selectCurrent}
               deleteSelected={props.deleteSelected}
               controlStatus={props.controlStatus}
+              currentDisabled={props.currentDisabled}
             />
           </TabPanel>
           <TabPanel key={2}>
@@ -39,6 +40,7 @@ const DashboardTabs = props => {
               selectCurrent={props.selectCurrentBarcode}
               deleteSelected={props.deleteSelectedBarcode}
               controlStatus={props.controlStatus}
+              currentDisabled={props.currentDisabled}
             />
           </TabPanel>
         </TabPanels>

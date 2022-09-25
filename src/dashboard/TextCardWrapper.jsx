@@ -285,6 +285,7 @@ export const TextCardWrapper = props => {
                 text={textbox.text}
                 selectCurrent={() => props.selectCurrent(textbox.id)}
                 deleteSelected={() => props.deleteSelected(textbox.id)}
+                currentDisabled={props.currentDisabled}
               />
             );
           })}
