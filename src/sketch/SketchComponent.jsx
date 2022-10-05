@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import Sketch from 'react-p5';
 import { CONTROL_STATUS, RECT_TYPE, TEMPLATE_TYPE } from '../dashboard/enums';
 
-let selectedTemplate = 1;
+let selectedTemplate = '1';
 let resizeSize = 10;
 let isBeingResized = false;
 let isBeingDragged = false;
@@ -43,7 +43,7 @@ const SketchComponent = props => {
       img = p5hold.loadImage(
         `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.barcode}`
       );
-      console.log('current.bar.im', current);
+      //   console.log('current.bar.im', current);
       current.bar = { img: img };
     }
   }, [props.rectFormData]);
@@ -138,7 +138,7 @@ const SketchComponent = props => {
 
   const drawBarcode = (p5, rect) => {
     let position = rect.position;
-    console.log(rect, img);
+    // console.log(rect, img);
     let selectedImage =
       rect.bar.img === 'load'
         ? loadImage(rect)

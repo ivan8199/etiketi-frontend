@@ -23,14 +23,7 @@ export const Navbar = () => {
                   <Button key={item}>{item}</Button>
                 ))}
               </ButtonGroup>
-              <HStack spacing="3">
-                {/* <Button variant="ghost" colorScheme={'blue'}>
-                  Sign in
-                </Button>
-                <Button variant="primary" colorScheme={'blue'}>
-                  Sign up
-                </Button> */}
-              </HStack>
+              <HStack spacing="3"></HStack>
             </Flex>
           </HStack>
         </Container>

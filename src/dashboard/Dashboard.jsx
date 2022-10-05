@@ -21,6 +21,8 @@ const Dashboard = () => {
   const [rectFormData, setRectFormData] = useState(defaultRectangleFormData);
   const [rectArray, setRectArray] = useState([]);
 
+  const [p5hold, setp5hold] = useState({});
+
   const onFormDataChange = value => {
     setRectFormData(prev => {
       return { ...prev, ...value };
@@ -116,37 +118,22 @@ const Dashboard = () => {
     setSelectedTemplate(event.target.value);
   };
 
-  // const getCurrent = () => {
-  //   console.log({ textboxArray: textboxArray, barcodeArray: barcodeArray });
-  //   saveTemplateAsFile('export.json', {
-  //     textboxArray: textboxArray,
-  //     barcodeArray: barcodeArray.map(barcode => {
-  //       return { ...barcode, position: { ...barcode.position, img: 'load' } };
-  //     }),
-  //     selectedTemplate: selectedTemplate,
-  //   });
-  // };
+  const exportJsonHandler = () => {
+    const exportData = {
+      rectArray: rectArray.map(rect => {
+        if (rect.type === RECT_TYPE.BAR)
+          return { ...rect, bar: { ...rect.bar, img: 'load' } };
+        else return rect;
+      }),
+      selectedTemplate: selectedTemplate,
+    };
 
-  // const handleChange = e => {
-  //   // const fileReader = new FileReader();
-  //   // fileReader.readAsText(e.target.files[0], 'UTF-8');
-  //   // fileReader.onload = e => {
-  //   //   const imported = JSON.parse(e.target.result);
-  //   //   console.log(imported);
-  //   //   setTextboxArray(imported.textboxArray);
-  //   //   setBarcodeArray(imported.barcodeArray);
-  //   //   setSelectedTemplate(imported.selectedTemplate);
-  //   //   createCanvasSelected(imported.selectedTemplate);
-  //   // };
-  // };
-
-  const saveTemplateAsFile = (filename, dataObjToWrite) => {
-    const blob = new Blob([JSON.stringify(dataObjToWrite)], {
+    const blob = new Blob([JSON.stringify(exportData)], {
       type: 'text/json',
     });
     const link = document.createElement('a');
 
-    link.download = filename;
+    link.download = 'export.json';
     link.href = window.URL.createObjectURL(blob);
     link.dataset.downloadurl = ['text/json', link.download, link.href].join(
       ':'
@@ -162,7 +149,16 @@ const Dashboard = () => {
     link.remove();
   };
 
-  const [p5hold, setp5hold] = useState({});
+  const importJsonHandler = e => {
+    const fileReader = new FileReader();
+    fileReader.readAsText(e.target.files[0], 'UTF-8');
+    fileReader.onload = e => {
+      const importedData = JSON.parse(e.target.result);
+      setRectArray(importedData.rectArray);
+      setSelectedTemplate(importedData.selectedTemplate);
+      createCanvasSelected(importedData.selectedTemplate);
+    };
+  };
 
   const createCanvas = () => {
     p5hold?.resizeCanvas(
@@ -192,7 +188,7 @@ const Dashboard = () => {
           </Button> */}
           <Input
             type="file"
-            // onChange={handleChange}
+            onChange={importJsonHandler}
             id={'fileupload'}
             display={'none'}
             accept={'application/json'}
@@ -200,7 +196,7 @@ const Dashboard = () => {
           <SelectMenu
             selectedTemplate={selectedTemplate}
             onChange={onSelectedChangeHandler}
-            // getCurrent={getCurrent}
+            exportJson={exportJsonHandler}
             createCanvas={createCanvas}
           />
           <SketchComponent

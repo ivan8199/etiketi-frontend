@@ -9,9 +9,6 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   Select,
   VStack,
 } from '@chakra-ui/react';
@@ -55,9 +52,7 @@ const SelectMenu = props => {
           link.click();
 
           document.body.removeChild(link);
-          //   URL.revokeObjectURL(url);
         });
-      // console.log(blob);
     }, 'image/png');
   };
 
@@ -76,8 +71,8 @@ const SelectMenu = props => {
             value={props.selectedTemplate}
             bg={'white'}
           >
-            <option value={1}>70mm x 31.5 (3x7)</option>
-            <option value={2}>105mm x 74.25mm (2x4)</option>
+            <option value={'1'}>70mm x 31.5 (3x7)</option>
+            <option value={'2'}>105mm x 74.25mm (2x4)</option>
           </Select>
         </FormControl>
         <ButtonGroup
@@ -127,7 +122,7 @@ const SelectMenu = props => {
           <Button boxShadow={'lg'} width={'50%'} onClick={create}>
             Save PDF
           </Button>
-          <Button boxShadow={'lg'} width={'50%'} onClick={props.getCurrent}>
+          <Button boxShadow={'lg'} width={'50%'} onClick={props.exportJson}>
             Export JSON
           </Button>
         </ButtonGroup>
