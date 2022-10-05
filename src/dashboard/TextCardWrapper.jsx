@@ -24,6 +24,7 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import { GithubPicker } from 'react-color';
+import { CONTROL_STATUS, RECT_TYPE } from './enums';
 import TextCard from './TextCard';
 const colors = [
   '#B80000',
@@ -78,7 +79,7 @@ export const TextCardWrapper = props => {
                 fontSize={'xs'}
                 placeholder="Enter text..."
                 rows={2}
-                value={props.textboxFormData.text}
+                value={props.rectFormData?.text}
                 onChange={e => {
                   props.onFormDataChange({ text: e.target.value });
                 }}
@@ -91,13 +92,13 @@ export const TextCardWrapper = props => {
               <Slider
                 min={14}
                 max={80}
-                value={props.textboxFormData.fontSize}
+                value={props.rectFormData?.fontSize}
                 onChange={e => {
                   props.onFormDataChange({ fontSize: e });
                 }}
               >
                 <SliderMark
-                  value={props.textboxFormData.fontSize}
+                  value={props.rectFormData?.fontSize}
                   textAlign="center"
                   fontSize={'0.8rem'}
                   bg="blue.500"
@@ -106,7 +107,7 @@ export const TextCardWrapper = props => {
                   ml="-3"
                   w="6"
                 >
-                  {props.textboxFormData.fontSize}
+                  {props.rectFormData?.fontSize}
                 </SliderMark>
                 <SliderTrack>
                   <SliderFilledTrack />
@@ -122,13 +123,13 @@ export const TextCardWrapper = props => {
                 min={0.01}
                 max={4}
                 step={0.01}
-                value={props.textboxFormData.fontWeight}
+                value={props.rectFormData?.fontWeight}
                 onChange={e => {
                   props.onFormDataChange({ fontWeight: e });
                 }}
               >
                 <SliderMark
-                  value={props.textboxFormData.fontWeight}
+                  value={props.rectFormData?.fontWeight}
                   textAlign="center"
                   fontSize={'0.8rem'}
                   bg="blue.500"
@@ -137,7 +138,7 @@ export const TextCardWrapper = props => {
                   ml="-1"
                   w="6"
                 >
-                  {props.textboxFormData.fontWeight}
+                  {props.rectFormData?.fontWeight}
                 </SliderMark>
                 <SliderTrack>
                   <SliderFilledTrack />
@@ -154,13 +155,13 @@ export const TextCardWrapper = props => {
                 min={0}
                 max={50}
                 step={1}
-                value={props.textboxFormData.padding}
+                value={props.rectFormData?.padding}
                 onChange={e => {
                   props.onFormDataChange({ padding: e });
                 }}
               >
                 <SliderMark
-                  value={props.textboxFormData.padding}
+                  value={props.rectFormData?.padding}
                   textAlign="center"
                   fontSize={'0.8rem'}
                   bg="blue.500"
@@ -169,7 +170,7 @@ export const TextCardWrapper = props => {
                   ml="-1"
                   w="6"
                 >
-                  {props.textboxFormData.padding}
+                  {props.rectFormData?.padding}
                 </SliderMark>
                 <SliderTrack>
                   <SliderFilledTrack />
@@ -185,13 +186,13 @@ export const TextCardWrapper = props => {
                 min={0}
                 max={20}
                 step={0.2}
-                value={props.textboxFormData.border}
+                value={props.rectFormData?.border}
                 onChange={e => {
                   props.onFormDataChange({ border: e });
                 }}
               >
                 <SliderMark
-                  value={props.textboxFormData.border}
+                  value={props.rectFormData?.border}
                   textAlign="center"
                   fontSize={'0.8rem'}
                   bg="blue.500"
@@ -200,7 +201,7 @@ export const TextCardWrapper = props => {
                   ml="-1"
                   w="6"
                 >
-                  {props.textboxFormData.border}
+                  {props.rectFormData?.border}
                 </SliderMark>
                 <SliderTrack>
                   <SliderFilledTrack />
@@ -216,8 +217,11 @@ export const TextCardWrapper = props => {
                 colorScheme={'blue'}
                 size={'sm'}
                 leftIcon={<AddIcon fontSize={'0.7rem'} />}
-                onClick={() => props.setControlStatus('DRAW')}
-                disabled={props.controlStatus !== 'NONE'}
+                onClick={() => {
+                  props.setRectType(RECT_TYPE.TXT);
+                  props.setControlStatus(CONTROL_STATUS.DRAW);
+                }}
+                disabled={props.controlStatus !== CONTROL_STATUS.IDLE}
               >
                 Add
               </Button>
@@ -226,8 +230,10 @@ export const TextCardWrapper = props => {
                 colorScheme={'blue'}
                 size={'sm'}
                 leftIcon={<PlusSquareIcon fontSize={'0.7rem'} />}
-                onClick={props.addTextbox}
-                disabled={props.controlStatus === 'NONE'}
+                onClick={() => {
+                  props.addRectangle(RECT_TYPE.TXT);
+                }}
+                disabled={props.controlStatus === CONTROL_STATUS.IDLE}
               >
                 Save
               </Button>
@@ -276,15 +282,15 @@ export const TextCardWrapper = props => {
           h={'350px'}
           borderTop={'1px solid #E2E8F0'}
         >
-          {props.textboxArray.map(textbox => {
+          {props.rectArray?.map(rect => {
             return (
               <TextCard
-                id={textbox.id}
-                key={textbox.id}
-                title={textbox.title}
-                text={textbox.text}
-                selectCurrent={() => props.selectCurrent(textbox.id)}
-                deleteSelected={() => props.deleteSelected(textbox.id)}
+                id={rect.id}
+                key={rect.id}
+                title={rect.txt?.title}
+                text={rect.txt?.text}
+                selectRectangle={() => props.selectRectangle(rect.id)}
+                deleteRectangle={() => props.deleteRectangle(rect.id)}
                 currentDisabled={props.currentDisabled}
               />
             );

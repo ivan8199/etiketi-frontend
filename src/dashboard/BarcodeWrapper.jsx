@@ -20,6 +20,7 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import { GithubPicker } from 'react-color';
+import { CONTROL_STATUS, RECT_TYPE } from './enums';
 import TextCard from './TextCard';
 
 export const BarcodeWrapper = props => {
@@ -48,7 +49,7 @@ export const BarcodeWrapper = props => {
                 fontSize={'xs'}
                 placeholder="Enter text..."
                 rows={2}
-                value={props.barcodeFormData.barcode}
+                value={props.rectFormData?.barcode}
                 onChange={e => {
                   // console.log(e.target.value);
                   props.onFormDataChange({ barcode: e.target.value });
@@ -60,7 +61,7 @@ export const BarcodeWrapper = props => {
                   // console.log(e);
                   props.onFormDataChange({ rotation: parseInt(e) });
                 }}
-                value={props.barcodeFormData.rotation}
+                value={props.rectFormData?.rotation}
               >
                 <Stack direction="row">
                   <Radio value={0}>0</Radio>
@@ -78,8 +79,11 @@ export const BarcodeWrapper = props => {
                 colorScheme={'blue'}
                 size={'sm'}
                 leftIcon={<AddIcon fontSize={'0.7rem'} />}
-                onClick={() => props.setControlStatus('BARCODE')}
-                disabled={props.controlStatus !== 'NONE'}
+                onClick={() => {
+                  props.setRectType(RECT_TYPE.BAR);
+                  props.setControlStatus(CONTROL_STATUS.DRAW);
+                }}
+                disabled={props.controlStatus !== CONTROL_STATUS.IDLE}
               >
                 Add
               </Button>
@@ -88,8 +92,10 @@ export const BarcodeWrapper = props => {
                 colorScheme={'blue'}
                 size={'sm'}
                 leftIcon={<PlusSquareIcon fontSize={'0.7rem'} />}
-                onClick={props.addBarcode}
-                disabled={props.controlStatus === 'NONE'}
+                onClick={() => {
+                  props.addRectangle(RECT_TYPE.BAR);
+                }}
+                disabled={props.controlStatus === CONTROL_STATUS.IDLE}
               >
                 Save
               </Button>
@@ -105,15 +111,15 @@ export const BarcodeWrapper = props => {
           h={'350px'}
           borderTop={'1px solid #E2E8F0'}
         >
-          {props.barcodeArray.map(barcode => {
+          {props.rectArray.map(barcode => {
             return (
               <TextCard
                 id={barcode.id}
                 key={barcode.id}
-                title={barcode.title}
-                text={barcode.barcode}
-                selectCurrent={() => props.selectCurrent(barcode.id)}
-                deleteSelected={() => props.deleteSelected(barcode.id)}
+                title={barcode.txt?.title}
+                text={barcode.txt?.text}
+                selectRectangle={() => props.selectRectangle(barcode.id)}
+                deleteRectangle={() => props.deleteRectangle(barcode.id)}
                 currentDisabled={props.currentDisabled}
               />
             );

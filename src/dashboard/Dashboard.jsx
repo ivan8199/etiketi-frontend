@@ -1,230 +1,111 @@
-import { Button, Container, Flex, VStack } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import { Container, Flex, Input, VStack } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import SelectMenu from '../sketch/SelectMenu';
 import SketchComponent from '../sketch/SketchComponent';
+import {
+  CONTROL_STATUS,
+  defaultRectangleFormData,
+  RECT_TYPE,
+  TEMPLATE_TYPE,
+} from './enums';
+
 import DashboardTabs from './DashboardTabs';
-import { v4 as uuidv4 } from 'uuid';
-const demo1text = [
-  {
-    position: {
-      x: 5,
-      y: 6,
-      w: 73,
-      h: 42,
-    },
-    text: 'MK',
-    fontSize: 36,
-    fontWeight: 1.53,
-    padding: 6,
-    border: 0,
-    fontColor: '#000',
-    bgColor: '#fff',
-    borderColor: '#000',
-    id: '4a8c3f4a-ce2d-45d9-a59d-af0fd769a70f',
-  },
-  {
-    position: {
-      x: 72,
-      y: 12,
-      w: 223,
-      h: 35,
-    },
-    text: 'ПРАСКА НЕКТАР. Произведен од концентрирано пире од праска.',
-    fontSize: 14,
-    fontWeight: 1.12,
-    padding: 1,
-    border: 0,
-    fontColor: '#000',
-    bgColor: '#fff',
-    borderColor: '#000',
-    id: '33ba5261-1652-4af8-9f89-a96ccaa5c356',
-  },
-  {
-    position: {
-      x: 5,
-      y: 47,
-      w: 295,
-      h: 67,
-    },
-    text: 'Содржина на овошје 50% минимум. Состојки концентрирано пире од праска, вода, шеќер, киселина (лимонска киселина), антиоксидант (аскробинска киселина)',
-    fontSize: 14,
-    fontWeight: 0.3,
-    padding: 1,
-    border: 0,
-    fontColor: '#000',
-    bgColor: '#fff',
-    borderColor: '#000',
-    id: 'db4be2ae-0351-49e5-9cc1-0ddce60af100',
-  },
-];
-
-const demo1barcode = [
-  {
-    barcode: '123456778',
-    id: 'dc6c4476-2b6a-47a7-91ec-1ea0c728401f',
-    position: { x: 15, y: 122, w: 271, h: 80 },
-  },
-];
-
-const defaultTextboxFormData = {
-  text: '',
-  fontSize: 14,
-  fontWeight: 0.2,
-  fontColor: '#000',
-  border: 1,
-  padding: 1,
-  bgColor: '#fff',
-  borderColor: '#000',
-};
-
-const defaultBarcodeFormData = {
-  barcode: '11111111',
-  rotation: 0,
-  img: {},
-};
 
 const Dashboard = () => {
+  const [selectedTemplate, setSelectedTemplate] = useState(1);
+  const [controlStatus, setControlStatus] = useState(CONTROL_STATUS.IDLE);
+  const [rectType, setRectType] = useState(RECT_TYPE.TXT);
+
   const [current, setCurrent] = useState({});
-  const [controlStatus, setControlStatus] = useState('NONE');
-  const [selectedTemplate, setSelectedTemplate] = useState('1');
-  const [textboxArray, setTextboxArray] = useState([]);
-  const [barcodeArray, setBarcodeArray] = useState([]);
-
-  const [textboxFormData, setTextboxFormData] = useState(
-    defaultTextboxFormData
-  );
-
-  const [barcodeFormData, setBarcodeFormData] = useState(
-    defaultBarcodeFormData
-  );
+  const [rectFormData, setRectFormData] = useState(defaultRectangleFormData);
+  const [rectArray, setRectArray] = useState([]);
 
   const onFormDataChange = value => {
-    setTextboxFormData(prev => {
+    setRectFormData(prev => {
       return { ...prev, ...value };
     });
   };
 
-  const onBarcodeFormDataChange = value => {
-    setBarcodeFormData(prev => {
-      // console.log({ ...prev, ...value });
-      return { ...prev, ...value };
-    });
-  };
-
-  const addBarcode = () => {
-    // console.log(barcodeArray);
-    if (barcodeFormData.id) {
-      setBarcodeArray(prev =>
-        prev.filter(x => {
-          return x.id !== barcodeFormData.id;
+  const addRectangle = rectType => {
+    // CHECK IF EXISTS, DELETE OLD VERSION
+    console.log('ID', rectFormData.id);
+    if (rectFormData.id) {
+      setRectArray(prevArray =>
+        prevArray.filter(rect => {
+          return rect.id !== rectFormData.id;
         })
       );
     }
-    // console.log(current.img);
-    setBarcodeArray(prev => [
+
+    // INSERT/UPDATE RECTANGLE
+    setRectArray(prev => [
       ...prev,
       {
-        position: {
-          x: current.x,
-          y: current.y,
-          w: current.w,
-          h: current.h,
-          img: current.img,
-          rotation: barcodeFormData.rotation,
-        },
-        barcode: barcodeFormData.barcode,
-
-        id: uuidv4(),
-      },
-    ]);
-    setCurrent({});
-    setBarcodeFormData(defaultBarcodeFormData);
-    setControlStatus('NONE');
-    // console.log(barcodeArray);
-
-    console.log('added');
-  };
-
-  useEffect(() => {
-    console.log(barcodeArray);
-  }, [barcodeArray]);
-
-  const addTextbox = () => {
-    if (textboxFormData.id) {
-      setTextboxArray(prev =>
-        prev.filter(x => {
-          return x.id !== textboxFormData.id;
-        })
-      );
-    }
-    setTextboxArray(prev => [
-      ...prev,
-      {
+        id: rectFormData.id ? rectFormData.id : uuidv4(),
+        type: rectType,
         position: {
           x: current.x,
           y: current.y,
           w: current.w,
           h: current.h,
         },
-        text: textboxFormData.text,
-        fontSize: textboxFormData.fontSize,
-        fontWeight: textboxFormData.fontWeight,
-        padding: textboxFormData.padding,
-        border: textboxFormData.border,
-        fontColor: textboxFormData.fontColor,
-        bgColor: textboxFormData.bgColor,
-        borderColor: textboxFormData.borderColor,
-        id: uuidv4(),
+        txt:
+          rectType === RECT_TYPE.TXT
+            ? {
+                text: rectFormData.text,
+                fontSize: rectFormData.fontSize,
+                fontWeight: rectFormData.fontWeight,
+                padding: rectFormData.padding,
+                border: rectFormData.border,
+                fontColor: rectFormData.fontColor,
+                bgColor: rectFormData.bgColor,
+                borderColor: rectFormData.borderColor,
+              }
+            : {},
+        bar:
+          rectType === RECT_TYPE.BAR
+            ? {
+                code: rectFormData.barcode,
+                img: current.bar.img,
+                rotation: rectFormData.rotation,
+              }
+            : {},
       },
     ]);
+
+    // CLEAR CURRENT
     setCurrent({});
-    setTextboxFormData(defaultTextboxFormData);
-    setControlStatus('NONE');
+
+    // CLEAR FORM DATA
+    setRectFormData(defaultRectangleFormData);
+
+    // RESET STATUS
+    setControlStatus(CONTROL_STATUS.IDLE);
   };
 
-  const selectCurrent = selectedId => {
-    const selected = textboxArray.filter(x => {
-      return x.id === selectedId;
+  const selectRectangle = selectedId => {
+    const selectedRect = rectArray.filter(rect => {
+      return rect.id === selectedId;
     })[0];
-    setCurrent(selected.position);
-    setTextboxFormData(selected);
-    setControlStatus('MOVE');
+
+    setCurrent(selectedRect.position);
+
+    if (selectedRect.type === RECT_TYPE.TXT)
+      setRectFormData({ ...selectedRect.txt, id: selectedRect.id });
+    else if (selectedRect.type === RECT_TYPE.BAR)
+      setRectFormData({ ...selectedRect.bar, id: selectedRect.id });
+
+    setControlStatus(CONTROL_STATUS.MOVE);
   };
 
-  const selectCurrentBarcode = selectedId => {
-    const selected = barcodeArray.filter(x => {
-      return x.id === selectedId;
-    })[0];
-    setCurrent(selected.position);
-    setBarcodeFormData({
-      id: selected.id,
-      barcode: selected.barcode,
-      rotation: selected.position.rotation,
-      img: selected.position.img,
-    });
-    // console.log('selectebarcode', selected);
-    setControlStatus('MOVEBARCODE');
-  };
-
-  const deleteSelected = selectedId => {
-    if (textboxFormData.id === selectedId) {
+  const deleteRectangle = selectedId => {
+    if (rectFormData.id === selectedId) {
       setCurrent({});
-      setTextboxFormData(defaultTextboxFormData);
-      setControlStatus('NONE');
+      setRectFormData(defaultRectangleFormData);
+      setControlStatus(CONTROL_STATUS.IDLE);
     }
-    setTextboxArray(prev =>
-      prev.filter(x => {
-        return x.id !== selectedId;
-      })
-    );
-  };
-  const deleteSelectedBarcode = selectedId => {
-    if (barcodeFormData.id === selectedId) {
-      setCurrent({});
-      setTextboxFormData(defaultBarcodeFormData);
-      setControlStatus('NONE');
-    }
-    setBarcodeArray(prev =>
+    setRectArray(prev =>
       prev.filter(x => {
         return x.id !== selectedId;
       })
@@ -235,17 +116,72 @@ const Dashboard = () => {
     setSelectedTemplate(event.target.value);
   };
 
-  const setupDemo = () => {
-    setTextboxArray(demo1text);
-    setBarcodeArray(demo1barcode);
-    setSelectedTemplate(2);
+  // const getCurrent = () => {
+  //   console.log({ textboxArray: textboxArray, barcodeArray: barcodeArray });
+  //   saveTemplateAsFile('export.json', {
+  //     textboxArray: textboxArray,
+  //     barcodeArray: barcodeArray.map(barcode => {
+  //       return { ...barcode, position: { ...barcode.position, img: 'load' } };
+  //     }),
+  //     selectedTemplate: selectedTemplate,
+  //   });
+  // };
+
+  // const handleChange = e => {
+  //   // const fileReader = new FileReader();
+  //   // fileReader.readAsText(e.target.files[0], 'UTF-8');
+  //   // fileReader.onload = e => {
+  //   //   const imported = JSON.parse(e.target.result);
+  //   //   console.log(imported);
+  //   //   setTextboxArray(imported.textboxArray);
+  //   //   setBarcodeArray(imported.barcodeArray);
+  //   //   setSelectedTemplate(imported.selectedTemplate);
+  //   //   createCanvasSelected(imported.selectedTemplate);
+  //   // };
+  // };
+
+  const saveTemplateAsFile = (filename, dataObjToWrite) => {
+    const blob = new Blob([JSON.stringify(dataObjToWrite)], {
+      type: 'text/json',
+    });
+    const link = document.createElement('a');
+
+    link.download = filename;
+    link.href = window.URL.createObjectURL(blob);
+    link.dataset.downloadurl = ['text/json', link.download, link.href].join(
+      ':'
+    );
+
+    const evt = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+
+    link.dispatchEvent(evt);
+    link.remove();
+  };
+
+  const [p5hold, setp5hold] = useState({});
+
+  const createCanvas = () => {
+    p5hold?.resizeCanvas(
+      TEMPLATE_TYPE?.[selectedTemplate]?.w,
+      TEMPLATE_TYPE?.[selectedTemplate]?.h
+    );
+  };
+  const createCanvasSelected = selectedTemplate => {
+    p5hold?.resizeCanvas(
+      TEMPLATE_TYPE?.[selectedTemplate]?.w,
+      TEMPLATE_TYPE?.[selectedTemplate]?.h
+    );
   };
 
   return (
     <Container maxW={'1280px'}>
       <Flex>
         <VStack width={'50%'}>
-          <Button
+          {/* <Button
             size={'xs'}
             variant={'outline'}
             colorScheme={'green'}
@@ -253,40 +189,42 @@ const Dashboard = () => {
             onClick={setupDemo}
           >
             Click here for demo example!
-          </Button>
+          </Button> */}
+          <Input
+            type="file"
+            // onChange={handleChange}
+            id={'fileupload'}
+            display={'none'}
+            accept={'application/json'}
+          />
           <SelectMenu
             selectedTemplate={selectedTemplate}
             onChange={onSelectedChangeHandler}
+            // getCurrent={getCurrent}
+            createCanvas={createCanvas}
           />
           <SketchComponent
             selectedTemplate={selectedTemplate}
-            textboxFormData={textboxFormData}
-            textboxArray={textboxArray}
-            addTextboxHandler={addTextbox}
-            textValue={textboxFormData?.text}
-            controlStatus={controlStatus}
+            currentRect={current}
             setCurrent={setCurrent}
-            Current={current}
-            barcodeArray={barcodeArray}
-            barcodeFormData={barcodeFormData}
+            controlStatus={controlStatus}
+            rectFormData={rectFormData}
+            rectArray={rectArray}
+            setp5hold={setp5hold}
+            rectType={rectType}
           />
         </VStack>
         <DashboardTabs
-          textboxArray={textboxArray}
-          onFormDataChange={onFormDataChange}
-          textboxFormData={textboxFormData}
-          barcodeFormData={barcodeFormData}
-          setControlStatus={setControlStatus}
           controlStatus={controlStatus}
-          addTextbox={addTextbox}
-          selectCurrent={selectCurrent}
-          deleteSelected={deleteSelected}
-          addBarcode={addBarcode}
-          barcodeArray={barcodeArray}
-          selectCurrentBarcode={selectCurrentBarcode}
-          deleteSelectedBarcode={deleteSelectedBarcode}
-          onBarcodeFormDataChange={onBarcodeFormDataChange}
+          setControlStatus={setControlStatus}
           currentDisabled={Object.keys(current).length !== 0}
+          rectArray={rectArray}
+          rectFormData={rectFormData}
+          addRectangle={addRectangle}
+          onFormDataChange={onFormDataChange}
+          selectRectangle={selectRectangle}
+          deleteRectangle={deleteRectangle}
+          setRectType={setRectType}
         />
       </Flex>
     </Container>

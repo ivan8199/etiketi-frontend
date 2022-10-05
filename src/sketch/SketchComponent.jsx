@@ -1,109 +1,78 @@
 import { Box } from '@chakra-ui/react';
-import axios from 'axios';
 import React, { useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import Sketch from 'react-p5';
+import { CONTROL_STATUS, RECT_TYPE, TEMPLATE_TYPE } from '../dashboard/enums';
 
-// let padding = 0;
-// let text = 'Computer cleaning spray (compressed)';
-let rectArray = [];
-let barcodeArray = [];
-let selectedTemplate = '1';
-let textboxFormData = {};
-let barcodeFormData = {};
-// let img;
-// let barcodedata = {
-//   x: 0,
-//   y: 0,
-//   w: 130,
-//   h: 70,
-//   offsetX: 0,
-//   offsetY: 0,
-// };
+let selectedTemplate = 1;
 let resizeSize = 10;
 let isBeingResized = false;
 let isBeingDragged = false;
-
 let current = {};
+let rectType = RECT_TYPE.TXT;
 let img;
-
-const templateTypes = {
-  T1: {
-    w: 198,
-    h: 120,
-  },
-  T2: {
-    w: 297,
-    h: 210,
-  },
-};
-
 let p5hold;
+let controlStatus = CONTROL_STATUS.IDLE;
 
-// NONE, MOVE, DRAW, RESIZE
-let controlStatus = 'NONE';
-
-let errorimg;
-
-// let selectedControl;
+let rectArray = [];
+let rectFormData = {};
 
 const SketchComponent = props => {
   useEffect(() => {
-    current = props.Current;
-    console.log(current);
-  }, [props.Current]);
+    selectedTemplate = props.selectedTemplate;
+  }, [props.selectedTemplate]);
+
+  useEffect(() => {
+    current = props.currentRect;
+    console.log('useEffect CURRENT:', props.currentRect);
+  }, [props.currentRect]);
 
   useEffect(() => {
     controlStatus = props.controlStatus;
-    console.log(controlStatus);
+    console.log('useEffect CONTROL STATUS:', controlStatus);
   }, [props.controlStatus]);
 
   useEffect(() => {
-    textboxFormData = props.textboxFormData;
-  }, [props.textboxFormData]);
+    rectArray = props.rectArray;
+  }, [props.rectArray]);
 
   useEffect(() => {
-    barcodeFormData = props.barcodeFormData;
-    img = p5hold.loadImage(
-      `https://etiketi-backend.herokuapp.com/main/barcode/${barcodeFormData.barcode}`
-    );
-    current.img = img;
-    console.log('barcodeFormData', barcodeFormData);
-  }, [props.barcodeFormData]);
+    rectFormData = props.rectFormData;
+
+    if (rectFormData.barcode) {
+      // TODO da se stavi env variable
+      img = p5hold.loadImage(
+        `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.barcode}`
+      );
+      console.log('current.bar.im', current);
+      current.bar = { img: img };
+    }
+  }, [props.rectFormData]);
 
   useEffect(() => {
-    rectArray = props.textboxArray;
-  }, [props.textboxArray]);
-
-  useEffect(() => {
-    barcodeArray = props.barcodeArray;
-  }, [props.barcodeArray]);
-
-  useEffect(() => {
-    selectedTemplate = props.selectedTemplate;
-    p5hold?.resizeCanvas(
-      templateTypes?.['T' + selectedTemplate]?.w,
-      templateTypes?.['T' + selectedTemplate]?.h
-    );
-  }, [props.selectedTemplate]);
+    rectType = props.rectType;
+  }, [props.rectType]);
 
   const setup = (p5, canvasParentRef) => {
     p5hold = p5;
+
+    props.setp5hold(p5);
+
     const cnv = p5
       .createCanvas(
-        templateTypes?.['T' + selectedTemplate]?.w,
-        templateTypes?.['T' + selectedTemplate]?.h
+        TEMPLATE_TYPE?.[selectedTemplate]?.w,
+        TEMPLATE_TYPE?.[selectedTemplate]?.h
       )
       .parent(canvasParentRef);
 
     cnv.mousePressed(event => {
-      if (controlStatus === 'DRAW' || controlStatus === 'BARCODE') {
-        current.img = p5.loadImage(
-          `https://etiketi-backend.herokuapp.com/main/barcode/${barcodeFormData.barcode}`
+      if (controlStatus === CONTROL_STATUS.DRAW) {
+        // TODO zaso ovde se loada
+        current.bar.img = p5.loadImage(
+          `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.barcode}`
         );
         current.x = p5.mouseX;
         current.y = p5.mouseY;
-      } else if (controlStatus === 'MOVE' || controlStatus === 'MOVEBARCODE') {
+      } else if (controlStatus === CONTROL_STATUS.MOVE) {
         if (mouseIsOverResizeBox(p5)) {
           isBeingResized = true;
           current.offsetX = current.x + current.w - p5.mouseX;
@@ -116,154 +85,90 @@ const SketchComponent = props => {
       }
     });
     cnv.mouseReleased(event => {
-      if (controlStatus === 'DRAW' || controlStatus === 'BARCODE') {
+      if (controlStatus === CONTROL_STATUS.DRAW) {
         current.w = p5.mouseX - current.x;
         current.h = p5.mouseY - current.y;
-
-        if (controlStatus === 'BARCODE') controlStatus = 'MOVEBARCODE';
-        else controlStatus = 'MOVE';
-        console.log(controlStatus);
-      } else if (controlStatus === 'MOVE' || controlStatus === 'MOVEBARCODE') {
+        controlStatus = CONTROL_STATUS.MOVE;
+      } else if (controlStatus === CONTROL_STATUS.MOVE) {
         isBeingResized = false;
         isBeingDragged = false;
       }
 
-      // console.log(img);
       props.setCurrent(current);
     });
   };
 
-  const drawTextbox = (p5, rect, selected) => {
+  const drawRectangle = (p5, rect, selected) => {
     p5.push();
 
     let position = rect.position;
+
     if (selected) {
       p5.stroke(p5.color('#3182ce'));
-      p5.strokeWeight(rect.border + 7);
+      p5.strokeWeight(rect.type === RECT_TYPE.TXT ? rect.txt.border + 7 : 7);
       p5.rect(position.x, position.y, position.w, position.h);
     }
-    p5.stroke(p5.color(rect.borderColor));
-    p5.strokeWeight(rect.border);
-    p5.fill(p5.color(rect.bgColor));
-    p5.rect(position.x, position.y, position.w, position.h);
-    p5.textSize(rect.fontSize);
-    p5.strokeWeight(rect.fontWeight);
-    p5.stroke(p5.color(rect.fontColor));
-    p5.fill(p5.color(rect.fontColor));
-    p5.text(
-      rect.text,
-      position.x + rect.padding,
-      position.y + rect.padding,
-      position.w - rect.padding,
-      position.h - rect.padding
-    );
+
+    if (rect.type === RECT_TYPE.TXT) drawText(p5, rect);
+    else if (rect.type === RECT_TYPE.BAR) drawBarcode(p5, rect);
 
     p5.pop();
   };
-  const drawBarcode = (p5, rect, selected) => {
-    p5.push();
 
-    // console.log('rect', rect);
+  const drawText = (p5, rect) => {
     let position = rect.position;
-    let selectedImage = position.img ? position.img : img;
+    let txt = rect.txt;
 
-    if (selected) {
-      p5.stroke(p5.color('#3182ce'));
-      p5.strokeWeight(7);
-      p5.rect(position.x, position.y, position.w, position.h);
-    }
+    p5.stroke(p5.color(txt.borderColor));
+    p5.strokeWeight(txt.border);
+    p5.fill(p5.color(txt.bgColor));
+    p5.rect(position.x, position.y, position.w, position.h);
+    p5.textSize(txt.fontSize);
+    p5.strokeWeight(txt.fontWeight);
+    p5.stroke(p5.color(txt.fontColor));
+    p5.fill(p5.color(txt.fontColor));
+    p5.text(
+      txt.text,
+      position.x + txt.padding,
+      position.y + txt.padding,
+      position.w - txt.padding,
+      position.h - txt.padding
+    );
+  };
+
+  const drawBarcode = (p5, rect) => {
+    let position = rect.position;
+    console.log(rect, img);
+    let selectedImage =
+      rect.bar.img === 'load'
+        ? loadImage(rect)
+        : rect.bar.img
+        ? rect.bar.img
+        : img;
 
     p5.imageMode(p5.CENTER);
     p5.angleMode(p5.DEGREES);
     p5.translate(position.x + position.w / 2, position.y + position.h / 2);
-    p5.rotate(position.rotation);
+    p5.rotate(rect.bar?.rotation);
 
-    if (position.rotation === 0 || position.rotation === 180)
+    if (rect.bar?.rotation === 0 || rect.bar?.rotation === 180)
       p5.image(selectedImage, 0, 0, position.w, position.h);
     else p5.image(selectedImage, 0, 0, position.h, position.w);
-    p5.pop();
   };
 
   const draw = p5 => {
     p5.background(255);
-    p5.text(p5.mouseX + ':' + p5.mouseY, 0, 0, 10, 10);
     rectArray.forEach(rect => {
-      drawTextbox(p5, rect);
+      drawRectangle(p5, rect);
     });
 
-    barcodeArray.forEach(rect => {
-      drawBarcode(p5, rect);
-    });
-    if (controlStatus === 'DRAW') {
+    if (controlStatus === CONTROL_STATUS.DRAW) {
       if (Object.keys(current).length !== 0) {
-        drawTextbox(p5, {
-          position: {
-            x: current.x,
-            y: current.y,
-            w: p5.mouseX - current.x,
-            h: p5.mouseY - current.y,
-          },
-          text: textboxFormData.text,
-          fontSize: textboxFormData.fontSize,
-          fontWeight: textboxFormData.fontWeight,
-          padding: textboxFormData.padding,
-          border: textboxFormData.border,
-          fontColor: textboxFormData.fontColor,
-          bgColor: textboxFormData.bgColor,
-          borderColor: textboxFormData.borderColor,
-        });
+        drawRectangle(p5, currentRectDraw(p5));
       }
-    } else if (controlStatus === 'BARCODE') {
+    } else if (controlStatus === CONTROL_STATUS.MOVE) {
       if (Object.keys(current).length !== 0) {
-        drawBarcode(p5, {
-          position: {
-            x: current.x,
-            y: current.y,
-            w: p5.mouseX - current.x,
-            h: p5.mouseY - current.y,
-            rotation: barcodeFormData.rotation,
-          },
-        });
-      }
-    } else if (controlStatus === 'MOVE' || controlStatus === 'MOVEBARCODE') {
-      if (Object.keys(current).length !== 0) {
-        if (controlStatus === 'MOVEBARCODE') {
-          // console.log('barcodeFormData.rotation', barcodeFormData.rotation);
-          drawBarcode(
-            p5,
-            {
-              position: {
-                x: current.x,
-                y: current.y,
-                w: current.w,
-                h: current.h,
-                rotation: barcodeFormData.rotation,
-              },
-            },
-            true
-          );
-        } else {
-          drawTextbox(
-            p5,
-            {
-              position: {
-                x: current.x,
-                y: current.y,
-                w: current.w,
-                h: current.h,
-              },
-              text: textboxFormData.text,
-              fontSize: textboxFormData.fontSize,
-              fontWeight: textboxFormData.fontWeight,
-              padding: textboxFormData.padding,
-              border: textboxFormData.border,
-              fontColor: textboxFormData.fontColor,
-              bgColor: textboxFormData.bgColor,
-              borderColor: textboxFormData.borderColor,
-            },
-            true
-          );
-        }
+        drawRectangle(p5, currentRectMove(), true);
       }
 
       if (isBeingDragged) {
@@ -272,8 +177,8 @@ const SketchComponent = props => {
       }
 
       if (mouseIsOver(p5) || isBeingResized) {
-        var resizeX = current.x + current.w - resizeSize;
-        var resizeY = current.y + current.h - resizeSize;
+        let resizeX = current.x + current.w - resizeSize;
+        let resizeY = current.y + current.h - resizeSize;
 
         p5.stroke(p5.color('#3182ce'));
         p5.strokeWeight(4);
@@ -287,9 +192,14 @@ const SketchComponent = props => {
     }
   };
 
-  const preload = p5 => {
-    console.log('preload');
-    // img = p5.loadImage('https://etiketi-backend.herokuapp.com/main/barcode/12345671');
+  const loadImage = rect => {
+    // TODO da se stavi env variable
+    const tempImg = p5hold.loadImage(
+      `https://etiketi-backend.herokuapp.com/main/barcode/${rect.bar.code}`
+    );
+    rect.bar.img = tempImg;
+
+    return tempImg;
   };
 
   const mouseIsOver = p5 => {
@@ -300,6 +210,7 @@ const SketchComponent = props => {
       p5.mouseY < current.y + current.h
     );
   };
+
   const mouseIsOverResizeBox = p5 => {
     return (
       p5.mouseX > current.x + current.w - resizeSize &&
@@ -309,10 +220,60 @@ const SketchComponent = props => {
     );
   };
 
+  const currentRectDraw = p5 => {
+    return {
+      type: rectType,
+      position: {
+        x: current.x,
+        y: current.y,
+        w: p5.mouseX - current.x,
+        h: p5.mouseY - current.y,
+      },
+      txt: {
+        text: rectFormData.text,
+        fontSize: rectFormData.fontSize,
+        fontWeight: rectFormData.fontWeight,
+        padding: rectFormData.padding,
+        border: rectFormData.border,
+        fontColor: rectFormData.fontColor,
+        bgColor: rectFormData.bgColor,
+        borderColor: rectFormData.borderColor,
+      },
+      bar: {
+        rotation: rectFormData.rotation,
+      },
+    };
+  };
+
+  const currentRectMove = () => {
+    return {
+      type: rectType,
+      position: {
+        x: current.x,
+        y: current.y,
+        w: current.w,
+        h: current.h,
+      },
+      txt: {
+        text: rectFormData.text,
+        fontSize: rectFormData.fontSize,
+        fontWeight: rectFormData.fontWeight,
+        padding: rectFormData.padding,
+        border: rectFormData.border,
+        fontColor: rectFormData.fontColor,
+        bgColor: rectFormData.bgColor,
+        borderColor: rectFormData.borderColor,
+      },
+      bar: {
+        rotation: rectFormData.rotation,
+      },
+    };
+  };
+
   return (
     <Box p={'3rem'}>
       <Box boxShadow={'dark-lg'} bg={'teal.200'}>
-        <Sketch id={'mainCanvas'} setup={setup} draw={draw} preload={preload} />
+        <Sketch id={'mainCanvas'} setup={setup} draw={draw} />
       </Box>
     </Box>
   );

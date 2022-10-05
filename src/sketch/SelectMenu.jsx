@@ -9,6 +9,9 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select,
   VStack,
 } from '@chakra-ui/react';
@@ -57,6 +60,10 @@ const SelectMenu = props => {
       // console.log(blob);
     }, 'image/png');
   };
+
+  const handleImport = () => {
+    document.getElementById('fileupload').click();
+  };
   return (
     <VStack width={'100%'}>
       <HStack width={'100%'} pt={4}>
@@ -69,8 +76,8 @@ const SelectMenu = props => {
             value={props.selectedTemplate}
             bg={'white'}
           >
-            <option value={'1'}>70mm x 31.5 (3x7)</option>
-            <option value={'2'}>105mm x 74.25mm (2x4)</option>
+            <option value={1}>70mm x 31.5 (3x7)</option>
+            <option value={2}>105mm x 74.25mm (2x4)</option>
           </Select>
         </FormControl>
         <ButtonGroup
@@ -82,10 +89,11 @@ const SelectMenu = props => {
           isAttached
           variant={'outline'}
         >
-          <Button boxShadow={'lg'} width={'50%'} isDisabled>
+          <Button boxShadow={'lg'} width={'50%'} onClick={props.createCanvas}>
             Create
           </Button>
-          <Button boxShadow={'lg'} width={'50%'} isDisabled>
+
+          <Button boxShadow={'lg'} width={'50%'} onClick={handleImport}>
             Import JSON
           </Button>
         </ButtonGroup>
@@ -119,7 +127,7 @@ const SelectMenu = props => {
           <Button boxShadow={'lg'} width={'50%'} onClick={create}>
             Save PDF
           </Button>
-          <Button boxShadow={'lg'} width={'50%'} isDisabled>
+          <Button boxShadow={'lg'} width={'50%'} onClick={props.getCurrent}>
             Export JSON
           </Button>
         </ButtonGroup>

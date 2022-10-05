@@ -16,15 +16,16 @@ const DashboardTabs = props => {
         <TabPanels>
           <TabPanel key={1} p={0}>
             <TextCardWrapper
-              setControlStatus={props.setControlStatus}
-              textboxArray={props.textboxArray}
-              onFormDataChange={props.onFormDataChange}
-              textboxFormData={props.textboxFormData}
-              addTextbox={props.addTextbox}
-              selectCurrent={props.selectCurrent}
-              deleteSelected={props.deleteSelected}
               controlStatus={props.controlStatus}
+              setControlStatus={props.setControlStatus}
               currentDisabled={props.currentDisabled}
+              rectArray={props.rectArray}
+              rectFormData={props.rectFormData}
+              addRectangle={props.addRectangle}
+              onFormDataChange={props.onFormDataChange}
+              selectRectangle={props.selectRectangle}
+              deleteRectangle={props.deleteRectangle}
+              setRectType={props.setRectType}
             />
           </TabPanel>
           <TabPanel key={2}>
@@ -32,15 +33,16 @@ const DashboardTabs = props => {
           </TabPanel>
           <TabPanel key={3}>
             <BarcodeWrapper
-              setControlStatus={props.setControlStatus}
-              barcodeArray={props.barcodeArray}
-              onFormDataChange={props.onBarcodeFormDataChange}
-              barcodeFormData={props.barcodeFormData}
-              addBarcode={props.addBarcode}
-              selectCurrent={props.selectCurrentBarcode}
-              deleteSelected={props.deleteSelectedBarcode}
               controlStatus={props.controlStatus}
+              setControlStatus={props.setControlStatus}
               currentDisabled={props.currentDisabled}
+              rectArray={props.rectArray}
+              rectFormData={props.rectFormData}
+              addRectangle={props.addRectangle}
+              onFormDataChange={props.onFormDataChange}
+              selectRectangle={props.selectRectangle}
+              deleteRectangle={props.deleteRectangle}
+              setRectType={props.setRectType}
             />
           </TabPanel>
         </TabPanels>
