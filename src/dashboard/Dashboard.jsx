@@ -1,5 +1,5 @@
 import { Container, Flex, Input, VStack } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import SelectMenu from '../sketch/SelectMenu';
 import SketchComponent from '../sketch/SketchComponent';
@@ -24,6 +24,10 @@ const Dashboard = () => {
       return { ...prev, ...value };
     });
   };
+
+  useEffect(() => {
+    console.log('rectArray', rectArray);
+  }, [rectArray]);
 
   const addRectangle = rectType => {
     // CHECK IF EXISTS, DELETE OLD VERSION
@@ -162,6 +166,7 @@ const Dashboard = () => {
       TEMPLATE_TYPE?.[selectedTemplate]?.h
     );
   };
+
   const createCanvasSelected = selectedTemplate => {
     p5hold?.resizeCanvas(
       TEMPLATE_TYPE?.[selectedTemplate]?.w,

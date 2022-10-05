@@ -44,7 +44,9 @@ const SketchComponent = props => {
         `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.barcode}`
       );
       //   console.log('current.bar.im', current);
-      current.bar = { img: img };
+
+      // ova e dzabe
+      // current.bar = { img: img };
     }
   }, [props.rectFormData]);
 
@@ -67,9 +69,9 @@ const SketchComponent = props => {
     cnv.mousePressed(event => {
       if (controlStatus === CONTROL_STATUS.DRAW) {
         // TODO zaso ovde se loada
-        current.bar.img = p5.loadImage(
-          `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.barcode}`
-        );
+        // current.bar.img = p5.loadImage(
+        //   `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.barcode}`
+        // );
         current.x = p5.mouseX;
         current.y = p5.mouseY;
       } else if (controlStatus === CONTROL_STATUS.MOVE) {
@@ -162,7 +164,7 @@ const SketchComponent = props => {
     });
 
     if (controlStatus === CONTROL_STATUS.DRAW) {
-      if (Object.keys(current).length !== 0) {
+      if (Object.keys(current).length !== 0 && current.x !== undefined) {
         drawRectangle(p5, currentRectDraw(p5));
       }
     } else if (controlStatus === CONTROL_STATUS.MOVE) {
@@ -240,6 +242,8 @@ const SketchComponent = props => {
       },
       bar: {
         rotation: rectFormData.rotation,
+        code: rectFormData.barcode,
+        img: img,
       },
     };
   };
