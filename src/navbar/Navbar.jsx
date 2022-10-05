@@ -19,7 +19,7 @@ export const Navbar = () => {
             <Logo />
             <Flex justify="space-between" flex="1">
               <ButtonGroup variant="link" spacing="8">
-                {['Home', 'Labels', 'Barcodes'].map(item => (
+                {['Dashboard', 'Labels', 'Barcodes'].map(item => (
                   <Button key={item}>{item}</Button>
                 ))}
               </ButtonGroup>

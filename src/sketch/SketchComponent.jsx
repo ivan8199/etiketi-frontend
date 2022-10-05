@@ -1,7 +1,7 @@
 import { Box } from '@chakra-ui/react';
 import React, { useEffect } from 'react';
 import Sketch from 'react-p5';
-import { CONTROL_STATUS, RECT_TYPE, TEMPLATE_TYPE } from '../dashboard/enums';
+import { CONTROL_STATUS, RECT_TYPE, TEMPLATE_TYPE } from '../utility/enums';
 
 let selectedTemplate = '1';
 let resizeSize = 10;
@@ -138,7 +138,6 @@ const SketchComponent = props => {
 
   const drawBarcode = (p5, rect) => {
     let position = rect.position;
-    // console.log(rect, img);
     let selectedImage =
       rect.bar.img === 'load'
         ? loadImage(rect)

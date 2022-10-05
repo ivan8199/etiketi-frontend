@@ -3,12 +3,8 @@ import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import SelectMenu from '../sketch/SelectMenu';
 import SketchComponent from '../sketch/SketchComponent';
-import {
-  CONTROL_STATUS,
-  defaultRectangleFormData,
-  RECT_TYPE,
-  TEMPLATE_TYPE,
-} from './enums';
+import { CONTROL_STATUS, RECT_TYPE, TEMPLATE_TYPE } from '../utility/enums';
+import { defaultRectangleFormData } from '../utility/utils';
 
 import DashboardTabs from './DashboardTabs';
 
@@ -69,7 +65,7 @@ const Dashboard = () => {
           rectType === RECT_TYPE.BAR
             ? {
                 code: rectFormData.barcode,
-                img: current.bar.img,
+                img: current.bar?.img,
                 rotation: rectFormData.rotation,
               }
             : {},

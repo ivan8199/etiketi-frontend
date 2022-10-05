@@ -2,7 +2,7 @@ import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import { IconButton, Stack, Text } from '@chakra-ui/react';
 import React from 'react';
 
-const TextCard = props => {
+const DisplayCard = props => {
   return (
     <Stack
       key={props.id}
@@ -37,4 +37,4 @@ const TextCard = props => {
   );
 };
 
-export default TextCard;
+export default DisplayCard;
