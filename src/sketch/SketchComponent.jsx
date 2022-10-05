@@ -38,7 +38,7 @@ const SketchComponent = props => {
   useEffect(() => {
     rectFormData = props.rectFormData;
 
-    if (rectFormData.barcode) {
+    if (rectFormData.barcode && p5hold) {
       // TODO da se stavi env variable
       img = p5hold.loadImage(
         `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.barcode}`
