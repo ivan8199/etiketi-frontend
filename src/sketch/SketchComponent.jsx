@@ -38,15 +38,11 @@ const SketchComponent = props => {
   useEffect(() => {
     rectFormData = props.rectFormData;
 
-    if (rectFormData.barcode && p5hold) {
+    if (rectFormData.code && p5hold) {
       // TODO da se stavi env variable
       img = p5hold.loadImage(
-        `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.barcode}`
+        `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.code}`
       );
-      //   console.log('current.bar.im', current);
-
-      // ova e dzabe
-      // current.bar = { img: img };
     }
   }, [props.rectFormData]);
 
@@ -68,10 +64,6 @@ const SketchComponent = props => {
 
     cnv.mousePressed(event => {
       if (controlStatus === CONTROL_STATUS.DRAW) {
-        // TODO zaso ovde se loada
-        // current.bar.img = p5.loadImage(
-        //   `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.barcode}`
-        // );
         current.x = p5.mouseX;
         current.y = p5.mouseY;
       } else if (controlStatus === CONTROL_STATUS.MOVE) {
@@ -242,7 +234,7 @@ const SketchComponent = props => {
       },
       bar: {
         rotation: rectFormData.rotation,
-        code: rectFormData.barcode,
+        code: rectFormData.code,
         img: img,
       },
     };
@@ -250,6 +242,7 @@ const SketchComponent = props => {
 
   const currentRectMove = () => {
     return {
+      id: rectFormData.id,
       type: rectType,
       position: {
         x: current.x,
@@ -269,6 +262,8 @@ const SketchComponent = props => {
       },
       bar: {
         rotation: rectFormData.rotation,
+        code: rectFormData.code,
+        img: rectFormData.img,
       },
     };
   };

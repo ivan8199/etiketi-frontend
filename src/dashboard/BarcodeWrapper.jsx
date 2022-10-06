@@ -27,9 +27,9 @@ export const BarcodeWrapper = props => {
           fontSize={'xs'}
           placeholder="Enter text..."
           rows={2}
-          value={props.rectFormData?.barcode}
+          value={props.rectFormData?.code}
           onChange={e => {
-            props.onFormDataChange({ barcode: e.target.value });
+            props.onFormDataChange({ code: e.target.value });
           }}
         />
       </FormControl>

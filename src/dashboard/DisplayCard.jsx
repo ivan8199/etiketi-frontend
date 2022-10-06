@@ -11,10 +11,15 @@ const DisplayCard = props => {
       spacing={'4'}
     >
       <Stack spacing={'0.5'} fontSize={'xs'}>
-        <Text color={'blue.700'} fontWeight="medium" textAlign={'start'}>
+        <Text
+          color={'blue.700'}
+          fontWeight="thin"
+          textAlign={'start'}
+          fontSize={'.67rem'}
+        >
           {props.id}
         </Text>
-        <Text color={'blue.600'} textAlign={'start'}>
+        <Text color={'blue.600'} textAlign={'start'} fontWeight="normal">
           {props.text}
         </Text>
       </Stack>

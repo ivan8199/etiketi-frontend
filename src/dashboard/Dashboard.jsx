@@ -30,51 +30,65 @@ const Dashboard = () => {
   }, [rectArray]);
 
   const addRectangle = rectType => {
-    // CHECK IF EXISTS, DELETE OLD VERSION
-    console.log('ID', rectFormData.id);
+    const editedRect = {
+      id: rectFormData.id ? rectFormData.id : uuidv4(),
+      type: rectType,
+      position: {
+        x: current.x,
+        y: current.y,
+        w: current.w,
+        h: current.h,
+      },
+      txt:
+        rectType === RECT_TYPE.TXT
+          ? {
+              text: rectFormData.text,
+              fontSize: rectFormData.fontSize,
+              fontWeight: rectFormData.fontWeight,
+              padding: rectFormData.padding,
+              border: rectFormData.border,
+              fontColor: rectFormData.fontColor,
+              bgColor: rectFormData.bgColor,
+              borderColor: rectFormData.borderColor,
+            }
+          : rectType === RECT_TYPE.BAR
+          ? {
+              text: rectFormData.code,
+            }
+          : {},
+      bar:
+        rectType === RECT_TYPE.BAR
+          ? {
+              code: rectFormData.code,
+              img: 'load',
+              rotation: rectFormData.rotation,
+            }
+          : {},
+    };
+
+    // ### replace same index of array
+    //
     if (rectFormData.id) {
       setRectArray(prevArray =>
-        prevArray.filter(rect => {
-          return rect.id !== rectFormData.id;
-        })
+        prevArray.map(rect => (rect.id !== editedRect.id ? rect : editedRect))
       );
+    } else {
+      setRectArray(prev => [...prev, editedRect]);
     }
 
+    // ### push to end off array
+    //
+    // CHECK IF EXISTS, DELETE OLD VERSION
+    // if (rectFormData.id) {
+    //   setRectArray(prevArray =>
+    //     prevArray.filter(rect => {
+    //       return rect.id !== rectFormData.id;
+    //     })
+    //   );
+    // }
+
     // INSERT/UPDATE RECTANGLE
-    setRectArray(prev => [
-      ...prev,
-      {
-        id: rectFormData.id ? rectFormData.id : uuidv4(),
-        type: rectType,
-        position: {
-          x: current.x,
-          y: current.y,
-          w: current.w,
-          h: current.h,
-        },
-        txt:
-          rectType === RECT_TYPE.TXT
-            ? {
-                text: rectFormData.text,
-                fontSize: rectFormData.fontSize,
-                fontWeight: rectFormData.fontWeight,
-                padding: rectFormData.padding,
-                border: rectFormData.border,
-                fontColor: rectFormData.fontColor,
-                bgColor: rectFormData.bgColor,
-                borderColor: rectFormData.borderColor,
-              }
-            : {},
-        bar:
-          rectType === RECT_TYPE.BAR
-            ? {
-                code: rectFormData.barcode,
-                img: current.bar?.img,
-                rotation: rectFormData.rotation,
-              }
-            : {},
-      },
-    ]);
+    // setRectArray(prev => [...prev, editedRect]);
 
     // CLEAR CURRENT
     setCurrent({});
@@ -95,9 +109,15 @@ const Dashboard = () => {
 
     if (selectedRect.type === RECT_TYPE.TXT)
       setRectFormData({ ...selectedRect.txt, id: selectedRect.id });
-    else if (selectedRect.type === RECT_TYPE.BAR)
+    else if (selectedRect.type === RECT_TYPE.BAR) {
+      // setCurrent(prev => {
+      //   console.log({ ...prev, bar: { img: selectedRect.bar.img } });
+      //   return { ...prev, bar: { img: selectedRect.bar.img } };
+      // });
+      console.log({ ...selectedRect.bar, id: selectedRect.id });
       setRectFormData({ ...selectedRect.bar, id: selectedRect.id });
-
+    }
+    setRectType(selectedRect.type);
     setControlStatus(CONTROL_STATUS.MOVE);
   };
 
@@ -149,14 +169,28 @@ const Dashboard = () => {
     link.remove();
   };
 
+  // import ne raboti heroku e spor ne gi cita barkodovite 500
   const importJsonHandler = e => {
     const fileReader = new FileReader();
+    console.log(e.target.files[0]);
     fileReader.readAsText(e.target.files[0], 'UTF-8');
     fileReader.onload = e => {
       const importedData = JSON.parse(e.target.result);
       setRectArray(importedData.rectArray);
       setSelectedTemplate(importedData.selectedTemplate);
       createCanvasSelected(importedData.selectedTemplate);
+    };
+  };
+
+  const importImageHandler = e => {
+    const fileReader = new FileReader();
+    console.log(e.target.files[0]);
+    fileReader.readAsText(e.target.files[0], 'UTF-8');
+    fileReader.onload = e => {
+      console.log(e.target.result);
+      // setRectArray(importedData.rectArray);
+      // setSelectedTemplate(importedData.selectedTemplate);
+      // createCanvasSelected(importedData.selectedTemplate);
     };
   };
 
@@ -193,6 +227,12 @@ const Dashboard = () => {
             id={'fileupload'}
             display={'none'}
             accept={'application/json'}
+          />
+          <Input
+            type="file"
+            onChange={importImageHandler}
+            id={'fileupload2'}
+            display={'none'}
           />
           <SelectMenu
             selectedTemplate={selectedTemplate}

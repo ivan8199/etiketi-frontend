@@ -1,4 +1,12 @@
-import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+} from '@chakra-ui/react';
 import React from 'react';
 import { TextCardWrapper } from './TextCardWrapper';
 import { BarcodeWrapper } from './BarcodeWrapper';
@@ -6,6 +14,9 @@ import RectangleWrapper from './RectangleWrapper';
 import { RECT_TYPE } from '../utility/enums';
 
 const DashboardTabs = props => {
+  const handleImport = () => {
+    document.getElementById('fileupload2').click();
+  };
   return (
     <Box width={'50%'} border={'1px solid #E2E8F0'} mt={4} borderRadius={'lg'}>
       <Tabs isFitted>
@@ -36,7 +47,11 @@ const DashboardTabs = props => {
               subtitle={'Upload an image and use it in the label'}
               rectArray={props.rectArray}
               rectType={RECT_TYPE.BAR}
-            ></RectangleWrapper>
+            >
+              <Button boxShadow={'lg'} width={'50%'} onClick={handleImport}>
+                Import image
+              </Button>
+            </RectangleWrapper>
           </TabPanel>
           <TabPanel key={3} p={0}>
             <BarcodeWrapper

@@ -7,7 +7,7 @@ export const defaultRectangleFormData = {
   padding: 1,
   bgColor: '#fff',
   borderColor: '#000',
-  barcode: '11111111',
+  code: '11111111',
   rotation: 0,
 };
 
