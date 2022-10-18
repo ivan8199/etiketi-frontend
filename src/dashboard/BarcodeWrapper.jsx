@@ -19,6 +19,7 @@ export const BarcodeWrapper = props => {
         'Type your barcode number in the field below, choose the orientation, and draw the barcode by dragging your mouse over the canvas area.'
       }
       rectType={RECT_TYPE.BAR}
+      code={props.rectFormData?.code}
     >
       <FormControl>
         <FormLabel fontSize={'xs'}>Text value</FormLabel>

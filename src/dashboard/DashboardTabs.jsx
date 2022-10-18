@@ -1,29 +1,28 @@
-import {
-  Box,
-  Button,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-} from '@chakra-ui/react';
+import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import React from 'react';
-import { TextCardWrapper } from './TextCardWrapper';
+import { CONTROL_STATUS } from '../utility/enums';
 import { BarcodeWrapper } from './BarcodeWrapper';
-import RectangleWrapper from './RectangleWrapper';
-import { RECT_TYPE } from '../utility/enums';
+import { ImageWrapper } from './ImageWrapper';
+import { TextCardWrapper } from './TextCardWrapper';
 
 const DashboardTabs = props => {
   const handleImport = () => {
     document.getElementById('fileupload2').click();
   };
+
   return (
     <Box width={'50%'} border={'1px solid #E2E8F0'} mt={4} borderRadius={'lg'}>
       <Tabs isFitted>
         <TabList>
-          <Tab>Text</Tab>
-          <Tab>Images</Tab>
-          <Tab>Barcodes</Tab>
+          <Tab isDisabled={props.controlStatus !== CONTROL_STATUS.IDLE}>
+            Text
+          </Tab>
+          <Tab isDisabled={props.controlStatus !== CONTROL_STATUS.IDLE}>
+            Images
+          </Tab>
+          <Tab isDisabled={props.controlStatus !== CONTROL_STATUS.IDLE}>
+            Barcodes
+          </Tab>
         </TabList>
 
         <TabPanels>
@@ -42,16 +41,19 @@ const DashboardTabs = props => {
             />
           </TabPanel>
           <TabPanel key={2} p={0}>
-            <RectangleWrapper
-              title={'Images'}
-              subtitle={'Upload an image and use it in the label'}
+            <ImageWrapper
+              handleImport={handleImport}
+              controlStatus={props.controlStatus}
+              setControlStatus={props.setControlStatus}
+              currentDisabled={props.currentDisabled}
               rectArray={props.rectArray}
-              rectType={RECT_TYPE.BAR}
-            >
-              <Button boxShadow={'lg'} width={'50%'} onClick={handleImport}>
-                Import image
-              </Button>
-            </RectangleWrapper>
+              rectFormData={props.rectFormData}
+              addRectangle={props.addRectangle}
+              onFormDataChange={props.onFormDataChange}
+              selectRectangle={props.selectRectangle}
+              deleteRectangle={props.deleteRectangle}
+              setRectType={props.setRectType}
+            />
           </TabPanel>
           <TabPanel key={3} p={0}>
             <BarcodeWrapper

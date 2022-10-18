@@ -2,6 +2,7 @@ import { Box } from '@chakra-ui/react';
 import React, { useEffect } from 'react';
 import Sketch from 'react-p5';
 import { CONTROL_STATUS, RECT_TYPE, TEMPLATE_TYPE } from '../utility/enums';
+import { apiurl } from '../utility/utils';
 
 let selectedTemplate = '1';
 let resizeSize = 10;
@@ -39,14 +40,18 @@ const SketchComponent = props => {
     rectFormData = props.rectFormData;
 
     if (rectFormData.code && p5hold) {
-      // TODO da se stavi env variable
-      img = p5hold.loadImage(
-        `https://etiketi-backend.herokuapp.com/main/barcode/${rectFormData.code}`
-      );
+      // todo da ne se loada na sekoj change na form data samo na barcode i file upload
+
+      if (props.rectType === RECT_TYPE.BAR)
+        img = p5hold.loadImage(`${apiurl}barcode/${rectFormData.code}`);
+      else if (props.rectType === RECT_TYPE.IMG && rectFormData.code) {
+        img = p5hold.loadImage(`${apiurl}download-image/${rectFormData.code}`);
+      }
     }
-  }, [props.rectFormData]);
+  }, [props.rectFormData, props.rectType]);
 
   useEffect(() => {
+    console.log(props.rectType);
     rectType = props.rectType;
   }, [props.rectType]);
 
@@ -105,6 +110,7 @@ const SketchComponent = props => {
 
     if (rect.type === RECT_TYPE.TXT) drawText(p5, rect);
     else if (rect.type === RECT_TYPE.BAR) drawBarcode(p5, rect);
+    else if (rect.type === RECT_TYPE.IMG) drawImage(p5, rect);
 
     p5.pop();
   };
@@ -133,18 +139,37 @@ const SketchComponent = props => {
   const drawBarcode = (p5, rect) => {
     let position = rect.position;
     let selectedImage =
-      rect.bar.img === 'load'
+      rect.img.data === 'load'
         ? loadImage(rect)
-        : rect.bar.img
-        ? rect.bar.img
+        : rect.img.data
+        ? rect.img.data
         : img;
 
     p5.imageMode(p5.CENTER);
     p5.angleMode(p5.DEGREES);
     p5.translate(position.x + position.w / 2, position.y + position.h / 2);
-    p5.rotate(rect.bar?.rotation);
+    p5.rotate(rect.img?.rotation);
 
-    if (rect.bar?.rotation === 0 || rect.bar?.rotation === 180)
+    if (rect.img?.rotation === 0 || rect.img?.rotation === 180)
+      p5.image(selectedImage, 0, 0, position.w, position.h);
+    else p5.image(selectedImage, 0, 0, position.h, position.w);
+  };
+
+  const drawImage = (p5, rect) => {
+    let position = rect.position;
+    let selectedImage =
+      rect.img.data === 'load'
+        ? loadImage(rect)
+        : rect.img.data
+        ? rect.img.data
+        : img;
+
+    p5.imageMode(p5.CENTER);
+    p5.angleMode(p5.DEGREES);
+    p5.translate(position.x + position.w / 2, position.y + position.h / 2);
+    p5.rotate(rect.img?.rotation);
+
+    if (rect.img?.rotation === 0 || rect.img?.rotation === 180)
       p5.image(selectedImage, 0, 0, position.w, position.h);
     else p5.image(selectedImage, 0, 0, position.h, position.w);
   };
@@ -186,11 +211,14 @@ const SketchComponent = props => {
   };
 
   const loadImage = rect => {
-    // TODO da se stavi env variable
-    const tempImg = p5hold.loadImage(
-      `https://etiketi-backend.herokuapp.com/main/barcode/${rect.bar.code}`
-    );
-    rect.bar.img = tempImg;
+    console.log(rect, rect.img.file);
+    let tempImg;
+    if (rect.type === RECT_TYPE.IMG) {
+      tempImg = p5hold.loadImage(`${apiurl}download-image/${rect.code}`);
+    } else if (rect.type === RECT_TYPE.BAR) {
+      tempImg = p5hold.loadImage(`${apiurl}barcode/${rect.code}`);
+    }
+    rect.img.data = tempImg;
 
     return tempImg;
   };
@@ -232,10 +260,9 @@ const SketchComponent = props => {
         bgColor: rectFormData.bgColor,
         borderColor: rectFormData.borderColor,
       },
-      bar: {
+      img: {
+        data: img,
         rotation: rectFormData.rotation,
-        code: rectFormData.code,
-        img: img,
       },
     };
   };
@@ -260,10 +287,9 @@ const SketchComponent = props => {
         bgColor: rectFormData.bgColor,
         borderColor: rectFormData.borderColor,
       },
-      bar: {
+      img: {
+        data: rectFormData.img,
         rotation: rectFormData.rotation,
-        code: rectFormData.code,
-        img: rectFormData.img,
       },
     };
   };

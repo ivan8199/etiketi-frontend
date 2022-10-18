@@ -1,10 +1,11 @@
 import { Container, Flex, Input, VStack } from '@chakra-ui/react';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import SelectMenu from '../sketch/SelectMenu';
 import SketchComponent from '../sketch/SketchComponent';
 import { CONTROL_STATUS, RECT_TYPE, TEMPLATE_TYPE } from '../utility/enums';
-import { defaultRectangleFormData } from '../utility/utils';
+import { apiurl, getDefaultRectangleFormData } from '../utility/utils';
 
 import DashboardTabs from './DashboardTabs';
 
@@ -14,7 +15,9 @@ const Dashboard = () => {
   const [rectType, setRectType] = useState(RECT_TYPE.TXT);
 
   const [current, setCurrent] = useState({});
-  const [rectFormData, setRectFormData] = useState(defaultRectangleFormData);
+  const [rectFormData, setRectFormData] = useState(
+    getDefaultRectangleFormData(RECT_TYPE.TXT)
+  );
   const [rectArray, setRectArray] = useState([]);
 
   const [p5hold, setp5hold] = useState({});
@@ -39,6 +42,14 @@ const Dashboard = () => {
         w: current.w,
         h: current.h,
       },
+      code: rectType === RECT_TYPE.TXT ? rectFormData.text : rectFormData.code,
+      img:
+        rectType === RECT_TYPE.IMG || rectType === RECT_TYPE.BAR
+          ? {
+              data: 'load',
+              rotation: rectFormData.rotation,
+            }
+          : {},
       txt:
         rectType === RECT_TYPE.TXT
           ? {
@@ -50,18 +61,6 @@ const Dashboard = () => {
               fontColor: rectFormData.fontColor,
               bgColor: rectFormData.bgColor,
               borderColor: rectFormData.borderColor,
-            }
-          : rectType === RECT_TYPE.BAR
-          ? {
-              text: rectFormData.code,
-            }
-          : {},
-      bar:
-        rectType === RECT_TYPE.BAR
-          ? {
-              code: rectFormData.code,
-              img: 'load',
-              rotation: rectFormData.rotation,
             }
           : {},
     };
@@ -76,25 +75,11 @@ const Dashboard = () => {
       setRectArray(prev => [...prev, editedRect]);
     }
 
-    // ### push to end off array
-    //
-    // CHECK IF EXISTS, DELETE OLD VERSION
-    // if (rectFormData.id) {
-    //   setRectArray(prevArray =>
-    //     prevArray.filter(rect => {
-    //       return rect.id !== rectFormData.id;
-    //     })
-    //   );
-    // }
-
-    // INSERT/UPDATE RECTANGLE
-    // setRectArray(prev => [...prev, editedRect]);
-
     // CLEAR CURRENT
     setCurrent({});
 
     // CLEAR FORM DATA
-    setRectFormData(defaultRectangleFormData);
+    setRectFormData(getDefaultRectangleFormData());
 
     // RESET STATUS
     setControlStatus(CONTROL_STATUS.IDLE);
@@ -109,13 +94,15 @@ const Dashboard = () => {
 
     if (selectedRect.type === RECT_TYPE.TXT)
       setRectFormData({ ...selectedRect.txt, id: selectedRect.id });
-    else if (selectedRect.type === RECT_TYPE.BAR) {
-      // setCurrent(prev => {
-      //   console.log({ ...prev, bar: { img: selectedRect.bar.img } });
-      //   return { ...prev, bar: { img: selectedRect.bar.img } };
-      // });
-      console.log({ ...selectedRect.bar, id: selectedRect.id });
-      setRectFormData({ ...selectedRect.bar, id: selectedRect.id });
+    else if (
+      selectedRect.type === RECT_TYPE.BAR ||
+      selectedRect.type === RECT_TYPE.IMG
+    ) {
+      setRectFormData({
+        ...selectedRect.img,
+        code: selectedRect.code,
+        id: selectedRect.id,
+      });
     }
     setRectType(selectedRect.type);
     setControlStatus(CONTROL_STATUS.MOVE);
@@ -124,7 +111,7 @@ const Dashboard = () => {
   const deleteRectangle = selectedId => {
     if (rectFormData.id === selectedId) {
       setCurrent({});
-      setRectFormData(defaultRectangleFormData);
+      setRectFormData(getDefaultRectangleFormData(rectType));
       setControlStatus(CONTROL_STATUS.IDLE);
     }
     setRectArray(prev =>
@@ -141,12 +128,13 @@ const Dashboard = () => {
   const exportJsonHandler = () => {
     const exportData = {
       rectArray: rectArray.map(rect => {
-        if (rect.type === RECT_TYPE.BAR)
-          return { ...rect, bar: { ...rect.bar, img: 'load' } };
-        else return rect;
+        if (rect.type === RECT_TYPE.BAR || rect.type === RECT_TYPE.IMG) {
+          return { ...rect, img: { ...rect.img, data: 'load' } };
+        } else return rect;
       }),
       selectedTemplate: selectedTemplate,
     };
+    console.log(exportData);
 
     const blob = new Blob([JSON.stringify(exportData)], {
       type: 'text/json',
@@ -183,15 +171,17 @@ const Dashboard = () => {
   };
 
   const importImageHandler = e => {
-    const fileReader = new FileReader();
-    console.log(e.target.files[0]);
-    fileReader.readAsText(e.target.files[0], 'UTF-8');
-    fileReader.onload = e => {
-      console.log(e.target.result);
-      // setRectArray(importedData.rectArray);
-      // setSelectedTemplate(importedData.selectedTemplate);
-      // createCanvasSelected(importedData.selectedTemplate);
-    };
+    var formData = new FormData();
+    formData.append('image', e.target.files[0]);
+    axios
+      .post(`${apiurl}upload-image`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      .then(response => {
+        onFormDataChange({ code: response.data });
+      });
   };
 
   const createCanvas = () => {
@@ -212,15 +202,6 @@ const Dashboard = () => {
     <Container maxW={'1280px'}>
       <Flex>
         <VStack width={'50%'}>
-          {/* <Button
-            size={'xs'}
-            variant={'outline'}
-            colorScheme={'green'}
-            mt={4}
-            onClick={setupDemo}
-          >
-            Click here for demo example!
-          </Button> */}
           <Input
             type="file"
             onChange={importJsonHandler}

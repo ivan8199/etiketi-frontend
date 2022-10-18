@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import React, { useState } from 'react';
+import { apiurl } from '../utility/utils';
 
 const SelectMenu = props => {
   const [selectedPageNumber, setSelectedPageNumber] = useState('1');
@@ -21,24 +22,19 @@ const SelectMenu = props => {
   const create = () => {
     const canvas = document.getElementById('defaultCanvas0');
     canvas.toBlob(async blob => {
+      console.log(blob);
       var formData = new FormData();
       formData.append('canvas', blob);
       formData.append('template', props.selectedTemplate);
       formData.append('pages', selectedPageNumber);
 
       axios
-        .post(
-          'https://etiketi-backend.herokuapp.com/main/download',
-          // TODO env variable
-          // 'https://etiketi-backend.herokuapp.com/main/download',
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            responseType: 'blob',
-          }
-        )
+        .post(`${apiurl}download`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          responseType: 'blob',
+        })
         .then(response => {
           const href = URL.createObjectURL(
             new Blob([response.data], { type: 'application/pdf' })

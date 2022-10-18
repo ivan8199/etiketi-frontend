@@ -1,14 +1,16 @@
-export const defaultRectangleFormData = {
-  text: '',
-  fontSize: 14,
-  fontWeight: 0.2,
-  fontColor: '#000',
-  border: 1,
-  padding: 1,
-  bgColor: '#fff',
-  borderColor: '#000',
-  code: '11111111',
-  rotation: 0,
+export const getDefaultRectangleFormData = type => {
+  return {
+    text: '',
+    fontSize: 14,
+    fontWeight: 0.2,
+    fontColor: '#000',
+    border: 1,
+    padding: 1,
+    bgColor: '#fff',
+    borderColor: '#000',
+    code: '',
+    rotation: 0,
+  };
 };
 
 export const colors = [
@@ -37,3 +39,5 @@ export const colors = [
   '#CCCCCC',
   '#FFFFFF',
 ];
+
+export const apiurl = process.env.REACT_APP_API_URL;

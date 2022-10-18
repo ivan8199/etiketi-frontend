@@ -9,7 +9,7 @@ import {
   StackDivider,
   Text,
 } from '@chakra-ui/react';
-import { CONTROL_STATUS } from '../utility/enums';
+import { CONTROL_STATUS, RECT_TYPE } from '../utility/enums';
 import DisplayCard from './DisplayCard';
 
 const RectangleWrapper = props => {
@@ -43,7 +43,11 @@ const RectangleWrapper = props => {
                   props.setRectType(props.rectType);
                   props.setControlStatus(CONTROL_STATUS.DRAW);
                 }}
-                disabled={props.controlStatus !== CONTROL_STATUS.IDLE}
+                disabled={
+                  props.controlStatus !== CONTROL_STATUS.IDLE ||
+                  (props.rectType === RECT_TYPE.IMG && !props.code) ||
+                  (props.rectType === RECT_TYPE.BAR && !props.code)
+                }
               >
                 Add
               </Button>
@@ -83,19 +87,21 @@ const RectangleWrapper = props => {
           h={'350px'}
           borderTop={'1px solid #E2E8F0'}
         >
-          {props.rectArray.map(rect => {
-            return (
-              <DisplayCard
-                id={rect.id}
-                key={rect.id}
-                title={rect.txt?.title}
-                text={rect.txt?.text}
-                selectRectangle={() => props.selectRectangle(rect.id)}
-                deleteRectangle={() => props.deleteRectangle(rect.id)}
-                currentDisabled={props.currentDisabled}
-              />
-            );
-          })}
+          {props.rectArray
+            .filter(rect => rect.type === props.rectType)
+            .map(rect => {
+              return (
+                <DisplayCard
+                  id={rect.id}
+                  key={rect.id}
+                  title={rect.txt?.title}
+                  text={rect.code}
+                  selectRectangle={() => props.selectRectangle(rect.id)}
+                  deleteRectangle={() => props.deleteRectangle(rect.id)}
+                  currentDisabled={props.currentDisabled}
+                />
+              );
+            })}
         </Stack>
       </Box>
     </Container>
